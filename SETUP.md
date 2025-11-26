@@ -14,9 +14,8 @@ Create a `.env` file in the root directory with the following variables:
 
 ```env
 # Gemini API Configuration
-VITE_GEMINI_API_KEY=AIzaSyA4JkBg8fAjNik4L3ceCJwZaNFiwcgW4BE
-VITE_GEMINI_MODEL=gemini-2.5-flash
-
+VITE_GEMINI_API_KEY=gemini-api-key
+VITE_GEMINI_MODEL=gemini-model
 # Supabase Configuration
 VITE_SUPABASE_URL=your-supabase-project-url
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
