@@ -123,7 +123,7 @@ END $$;
 -- Now we can safely drop the user_id column (uncomment if you want to remove it)
 -- ALTER TABLE public.courses DROP COLUMN IF EXISTS user_id;
 
--- Step 6: Create the new tables (modules, user_course_progress, ai_course_jobs)
+-- Step 6: Create the new tables (modules, user_course_progress)
 -- Modules table
 CREATE TABLE IF NOT EXISTS public.modules (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -155,19 +155,6 @@ CREATE TABLE IF NOT EXISTS public.user_course_progress (
   UNIQUE(course_id, user_id)
 );
 
--- AI course generation jobs table
-CREATE TABLE IF NOT EXISTS public.ai_course_jobs (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  status TEXT CHECK (status IN ('pending', 'running', 'done', 'failed')) DEFAULT 'pending',
-  inputs JSONB DEFAULT '{}'::jsonb,
-  result JSONB,
-  error_message TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  started_at TIMESTAMP WITH TIME ZONE,
-  finished_at TIMESTAMP WITH TIME ZONE
-);
-
 -- Step 7: Create indexes
 CREATE INDEX IF NOT EXISTS idx_courses_owner_id ON public.courses(owner_id);
 CREATE INDEX IF NOT EXISTS idx_courses_published ON public.courses(published);
@@ -176,8 +163,6 @@ CREATE INDEX IF NOT EXISTS idx_courses_category ON public.courses(category);
 CREATE INDEX IF NOT EXISTS idx_modules_course_id ON public.modules(course_id);
 CREATE INDEX IF NOT EXISTS idx_user_course_progress_course_id ON public.user_course_progress(course_id);
 CREATE INDEX IF NOT EXISTS idx_user_course_progress_user_id ON public.user_course_progress(user_id);
-CREATE INDEX IF NOT EXISTS idx_ai_course_jobs_user_id ON public.ai_course_jobs(user_id);
-CREATE INDEX IF NOT EXISTS idx_ai_course_jobs_status ON public.ai_course_jobs(status);
 
 -- Step 8: Update RLS policies for courses table
 -- Drop old policies if they exist
@@ -206,7 +191,6 @@ CREATE POLICY "Users can delete their own courses"
 -- Step 9: Enable RLS on new tables
 ALTER TABLE public.modules ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_course_progress ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ai_course_jobs ENABLE ROW LEVEL SECURITY;
 
 -- Step 10: Create RLS policies for modules
 CREATE POLICY "Users can view modules of accessible courses"
@@ -262,20 +246,7 @@ CREATE POLICY "Users can update their own progress"
   ON public.user_course_progress FOR UPDATE
   USING (auth.uid() = user_id);
 
--- Step 12: Create RLS policies for ai_course_jobs
-CREATE POLICY "Users can view their own AI jobs"
-  ON public.ai_course_jobs FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert their own AI jobs"
-  ON public.ai_course_jobs FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own AI jobs"
-  ON public.ai_course_jobs FOR UPDATE
-  USING (auth.uid() = user_id);
-
--- Step 13: Create triggers for updated_at
+-- Step 12: Create triggers for updated_at
 CREATE TRIGGER update_modules_updated_at BEFORE UPDATE ON public.modules
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 

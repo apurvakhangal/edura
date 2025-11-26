@@ -38,7 +38,6 @@ Before using the Courses module, you **MUST** run the migration SQL in your Supa
      - `courses` (updated structure with owner_id)
      - `modules` (new)
      - `user_course_progress` (new)
-     - `ai_course_jobs` (new)
 
 ## If You Have Existing Courses Table:
 
@@ -77,7 +76,7 @@ WHERE level IN ('Beginner', 'Intermediate', 'Advanced');
 
 1. **Test the Courses Page**
    - Go to `http://localhost:8080/courses`
-   - Try generating an AI course
+   - Browse the library and open a course detail page
    - Check browser console for any errors
 
 2. **If You Still See 400/404 Errors:**

@@ -6,7 +6,6 @@ Edura is a comprehensive, AI-powered learning platform designed to make educatio
 
 ### Core Features
 - **AI Study Assistant**: Interactive chatbot powered by Google Gemini AI for instant help and explanations
-- **AI-Generated Courses**: Create personalized courses with AI-generated content, quizzes, flashcards, and coding exercises
 - **Smart Learning Roadmaps**: AI-generated personalized learning paths based on your goals, skill level, and timeline
 - **Gamified Learning**: Earn XP, level up, maintain streaks, and compete on leaderboards
 - **Focus Room**: Pomodoro-style focus sessions with ambient sounds and progress tracking
@@ -47,7 +46,7 @@ Edura is a comprehensive, AI-powered learning platform designed to make educatio
 - **Storage**: Supabase Storage
 - **API**: Express.js server for external course fetching
 - **AI Services**:
-  - Google Gemini AI (course generation, chat, summaries)
+  - Google Gemini AI (chat, summaries, flashcards, quizzes, roadmaps)
   - RapidAPI Deep Translate (multi-language support)
 
 ### Project Structure
@@ -125,7 +124,6 @@ The application uses Supabase (PostgreSQL) with the following main tables:
 - **courses**: Course metadata
   - Title, description, level, category
   - Multi-language support (JSONB)
-  - AI-generated flag
   - Published status
 
 - **modules**: Course modules
@@ -154,10 +152,6 @@ The application uses Supabase (PostgreSQL) with the following main tables:
   - Duration, XP earned
   - Mode (focus/break)
 
-- **ai_course_jobs**: AI course generation jobs
-  - Status tracking
-  - Input/output (JSONB)
-
 #### Security
 - Row Level Security (RLS) enabled on all tables
 - Policies ensure users can only access their own data
@@ -178,7 +172,6 @@ The application uses Supabase (PostgreSQL) with the following main tables:
 
 #### External APIs
 - **Google Gemini AI**: 
-  - Course generation
   - Chat responses
   - Content summarization
   - Quiz/flashcard generation
@@ -289,16 +282,6 @@ Public routes:
    Navigate to `http://localhost:8080`
 
 ## 📚 Key Features Explained
-
-### AI Course Generation
-- Users provide subject, level, duration, and goals
-- Gemini AI generates complete course structure with:
-  - Multiple modules with detailed content
-  - Flashcards for each module
-  - Practice tasks and quizzes
-  - IDE coding exercises (for programming courses)
-  - Final test and projects
-- Courses are saved to Supabase and can be shared
 
 ### Learning Roadmaps
 - Two types:

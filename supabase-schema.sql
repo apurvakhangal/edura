@@ -70,19 +70,6 @@ CREATE TABLE IF NOT EXISTS public.user_course_progress (
   UNIQUE(course_id, user_id)
 );
 
--- AI course generation jobs table
-CREATE TABLE IF NOT EXISTS public.ai_course_jobs (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  status TEXT CHECK (status IN ('pending', 'running', 'done', 'failed')) DEFAULT 'pending',
-  inputs JSONB DEFAULT '{}'::jsonb,
-  result JSONB,
-  error_message TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  started_at TIMESTAMP WITH TIME ZONE,
-  finished_at TIMESTAMP WITH TIME ZONE
-);
-
 -- Study sessions table
 CREATE TABLE IF NOT EXISTS public.study_sessions (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -124,8 +111,6 @@ CREATE INDEX IF NOT EXISTS idx_courses_category ON public.courses(category);
 CREATE INDEX IF NOT EXISTS idx_modules_course_id ON public.modules(course_id);
 CREATE INDEX IF NOT EXISTS idx_user_course_progress_course_id ON public.user_course_progress(course_id);
 CREATE INDEX IF NOT EXISTS idx_user_course_progress_user_id ON public.user_course_progress(user_id);
-CREATE INDEX IF NOT EXISTS idx_ai_course_jobs_user_id ON public.ai_course_jobs(user_id);
-CREATE INDEX IF NOT EXISTS idx_ai_course_jobs_status ON public.ai_course_jobs(status);
 CREATE INDEX IF NOT EXISTS idx_study_sessions_user_id ON public.study_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_study_sessions_created_at ON public.study_sessions(created_at);
 CREATE INDEX IF NOT EXISTS idx_notes_user_id ON public.notes(user_id);
@@ -136,7 +121,6 @@ ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.modules ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_course_progress ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.ai_course_jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.study_sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.roadmaps ENABLE ROW LEVEL SECURITY;
@@ -223,19 +207,6 @@ CREATE POLICY "Users can insert their own progress"
 
 CREATE POLICY "Users can update their own progress"
   ON public.user_course_progress FOR UPDATE
-  USING (auth.uid() = user_id);
-
--- RLS Policies for ai_course_jobs table
-CREATE POLICY "Users can view their own AI jobs"
-  ON public.ai_course_jobs FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert their own AI jobs"
-  ON public.ai_course_jobs FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own AI jobs"
-  ON public.ai_course_jobs FOR UPDATE
   USING (auth.uid() = user_id);
 
 -- RLS Policies for study_sessions table

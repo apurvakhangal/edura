@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -8,64 +8,42 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { TranslatedText } from '@/components/TranslatedText';
 import { useTranslatedText } from '@/hooks/useTranslation';
 import {
   BookOpen,
-  Plus,
   Clock,
   Star,
   Search,
-  Filter,
-  Sparkles,
   Loader2,
   TrendingUp,
   Users,
   Code,
   GraduationCap,
-  ExternalLink,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   getPublishedCourses,
   getUserCourses,
-  generateAICourse,
   getExternalCourses,
   type Course,
   type ExternalCourse,
 } from '@/services/courseService';
-import { getCurrentUserId } from '@/lib/auth';
-import type { CourseGenerationInput } from '@/lib/gemini';
 
 export default function Courses() {
-  const [activeTab, setActiveTab] = useState<'library' | 'my-courses' | 'generate'>('library');
+  const [activeTab, setActiveTab] = useState<'library' | 'my-courses'>('library');
   const [publishedCourses, setPublishedCourses] = useState<Course[]>([]);
   const [myCourses, setMyCourses] = useState<Course[]>([]);
   const [externalCourses, setExternalCourses] = useState<ExternalCourse[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingExternal, setIsLoadingExternal] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     level: 'all' as 'all' | 'beginner' | 'intermediate' | 'advanced',
     category: 'all' as string,
     language: 'all' as string,
-  });
-
-  // AI Generation form state
-  const [showGenerateDialog, setShowGenerateDialog] = useState(false);
-  const [generationForm, setGenerationForm] = useState<CourseGenerationInput>({
-    subject: '',
-    level: 'beginner',
-    duration: 7,
-    language: 'en',
-    prior_knowledge: 'none',
-    user_goal: 'mastery',
-    category: '',
-    is_programming: false,
   });
 
   const { toast } = useToast();
@@ -239,251 +217,25 @@ export default function Courses() {
     }
   };
 
-  const handleGenerateCourse = async () => {
-    if (!generationForm.subject.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Please enter a subject',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setIsGenerating(true);
-    try {
-      const userId = await getCurrentUserId();
-      if (!userId) {
-        throw new Error('You must be logged in to generate a course');
-      }
-
-      const result = await generateAICourse(generationForm);
-
-      if (result.error) {
-        throw new Error(result.error);
-      }
-
-      if (result.course) {
-        toast({
-          title: 'Success',
-          description: 'Course generated successfully!',
-        });
-        setShowGenerateDialog(false);
-        setActiveTab('my-courses');
-        loadCourses();
-        navigate(`/courses/${result.course.id}`);
-      }
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to generate course',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   const totalModules = (myCourses || []).reduce((sum, c) => sum + (c.total_modules || 0), 0);
   const totalHours = (myCourses || []).reduce((sum, c) => sum + (c.estimated_hours || 0), 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="mb-8 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold"><TranslatedText text="Courses" /></h1>
-          </div>
-          <Dialog open={showGenerateDialog} onOpenChange={setShowGenerateDialog}>
-            <DialogTrigger asChild>
-              <Button>
-                <Sparkles className="mr-2 h-4 w-4" />
-                <TranslatedText text="Generate AI Course" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-primary" />
-                  <TranslatedText text="Generate AI-Powered Course" />
-                </DialogTitle>
-                <DialogDescription>
-                  <TranslatedText text="Fill in the details below and AI will create a personalized course for you" />
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div>
-                  <Label htmlFor="subject"><TranslatedText text="Subject/Topic" /></Label>
-                  <Input
-                    id="subject"
-                    placeholder="e.g., Operating Systems, Python Programming, Spanish"
-                    value={generationForm.subject}
-                    onChange={(e) => setGenerationForm({ ...generationForm, subject: e.target.value })}
-                    className="mt-1"
-                  />
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <Label htmlFor="level"><TranslatedText text="Level" /></Label>
-                    <Select
-                      value={generationForm.level}
-                      onValueChange={(value: 'beginner' | 'intermediate' | 'advanced') =>
-                        setGenerationForm({ ...generationForm, level: value })
-                      }
-                    >
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="beginner"><TranslatedText text="Beginner" /></SelectItem>
-                        <SelectItem value="intermediate"><TranslatedText text="Intermediate" /></SelectItem>
-                        <SelectItem value="advanced"><TranslatedText text="Advanced" /></SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="duration"><TranslatedText text="Duration (days)" /></Label>
-                    <Input
-                      id="duration"
-                      type="number"
-                      min="1"
-                      max="365"
-                      value={generationForm.duration}
-                      onChange={(e) =>
-                        setGenerationForm({ ...generationForm, duration: parseInt(e.target.value) || 7 })
-                      }
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <Label htmlFor="prior_knowledge"><TranslatedText text="Prior Knowledge" /></Label>
-                    <Select
-                      value={generationForm.prior_knowledge}
-                      onValueChange={(value: 'none' | 'some' | 'extensive') =>
-                        setGenerationForm({ ...generationForm, prior_knowledge: value })
-                      }
-                    >
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none"><TranslatedText text="None" /></SelectItem>
-                        <SelectItem value="some"><TranslatedText text="Some" /></SelectItem>
-                        <SelectItem value="extensive"><TranslatedText text="Extensive" /></SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="user_goal"><TranslatedText text="Learning Goal" /></Label>
-                    <Select
-                      value={generationForm.user_goal}
-                      onValueChange={(value: any) =>
-                        setGenerationForm({ ...generationForm, user_goal: value })
-                      }
-                    >
-                      <SelectTrigger className="mt-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="exam preparation"><TranslatedText text="Exam Preparation" /></SelectItem>
-                        <SelectItem value="revision"><TranslatedText text="Revision" /></SelectItem>
-                        <SelectItem value="mastery"><TranslatedText text="Mastery" /></SelectItem>
-                        <SelectItem value="hobby"><TranslatedText text="Hobby" /></SelectItem>
-                        <SelectItem value="career"><TranslatedText text="Career" /></SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <Label htmlFor="category"><TranslatedText text="Category (optional)" /></Label>
-                    <Select
-                      value={generationForm.category || ''}
-                      onValueChange={(value) =>
-                        setGenerationForm({ ...generationForm, category: value || undefined })
-                      }
-                    >
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat.value} value={cat.value}>
-                            {cat.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="language"><TranslatedText text="Language" /></Label>
-                    <Input
-                      id="language"
-                      placeholder="en, es, fr, hi, etc."
-                      value={generationForm.language}
-                      onChange={(e) => setGenerationForm({ ...generationForm, language: e.target.value })}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="is_programming"
-                    checked={generationForm.is_programming}
-                    onChange={(e) =>
-                      setGenerationForm({ ...generationForm, is_programming: e.target.checked })
-                    }
-                    className="h-4 w-4 rounded border-gray-300"
-                  />
-                  <Label htmlFor="is_programming" className="cursor-pointer">
-                    <TranslatedText text="This is a programming/technology course (includes IDE exercises)" />
-                  </Label>
-                </div>
-
-                <Button
-                  onClick={handleGenerateCourse}
-                  disabled={isGenerating}
-                  className="w-full"
-                  size="lg"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      <TranslatedText text="Generating Course..." />
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="mr-2 h-4 w-4" />
-                      <TranslatedText text="Generate Course" />
-                    </>
-                  )}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+        <div className="mb-8 flex items-center gap-3">
+          <BookOpen className="h-8 w-8 text-primary" />
+          <h1 className="text-3xl font-bold"><TranslatedText text="Courses" /></h1>
         </div>
       </motion.div>
 
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
-        <TabsList className="grid w-full max-w-md grid-cols-3">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
           <TabsTrigger value="library">
             <TranslatedText text="Course Library" />
           </TabsTrigger>
           <TabsTrigger value="my-courses">
             <TranslatedText text="My Courses" />
-          </TabsTrigger>
-          <TabsTrigger value="generate">
-            <TranslatedText text="Generate" />
           </TabsTrigger>
         </TabsList>
 
@@ -548,7 +300,7 @@ export default function Courses() {
             <Card>
               <CardContent className="p-12 text-center">
                 <p className="text-muted-foreground">
-                  <TranslatedText text="No courses found. Try adjusting your filters or generate a new course." />
+                  <TranslatedText text="No courses found. Try adjusting your filters or check back later." />
                 </p>
               </CardContent>
             </Card>
@@ -718,13 +470,12 @@ export default function Courses() {
           ) : !myCourses || myCourses.length === 0 ? (
             <Card>
               <CardContent className="p-12 text-center">
-                <Sparkles className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                <BookOpen className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
                 <p className="mb-4 text-muted-foreground">
-                  <TranslatedText text="You haven't created any courses yet." />
+                  <TranslatedText text="You haven't enrolled in any courses yet." />
                 </p>
-                <Button onClick={() => setShowGenerateDialog(true)}>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  <TranslatedText text="Generate Your First Course" />
+                <Button onClick={() => setActiveTab('library')}>
+                  <TranslatedText text="Browse Course Library" />
                 </Button>
               </CardContent>
             </Card>
@@ -743,12 +494,6 @@ export default function Courses() {
                         <Badge className={difficultyColors[course.level]}>
                           <TranslatedText text={course.level} />
                         </Badge>
-                        {course.is_ai_generated && (
-                          <Badge variant="outline" className="text-xs">
-                            <Sparkles className="mr-1 h-3 w-3" />
-                            AI
-                          </Badge>
-                        )}
                       </div>
                       <CardTitle className="line-clamp-2">{course.title}</CardTitle>
                       <CardDescription className="line-clamp-2">
@@ -775,32 +520,6 @@ export default function Courses() {
               ))}
             </div>
           )}
-        </TabsContent>
-
-        {/* Generate Tab */}
-        <TabsContent value="generate" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                <TranslatedText text="AI Course Generator" />
-              </CardTitle>
-              <CardDescription>
-                <TranslatedText text="Create a personalized course tailored to your learning goals" />
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <p className="text-muted-foreground">
-                  <TranslatedText text="Click the button above to open the course generation form, or use the filters to browse existing courses in the library." />
-                </p>
-                <Button onClick={() => setShowGenerateDialog(true)} size="lg" className="w-full">
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  <TranslatedText text="Start Generating Course" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
     </div>
