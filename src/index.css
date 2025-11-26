@@ -161,3 +161,41 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Study planner calendar overrides */
+.study-calendar .react-calendar {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+}
+
+.study-calendar .react-calendar__tile {
+  border-radius: 0.75rem;
+  min-height: 64px;
+  padding: 0.5rem;
+  transition: var(--transition-smooth);
+}
+
+.study-calendar .react-calendar__tile--now {
+  background-color: hsl(var(--accent) / 0.15);
+}
+
+.study-calendar .has-study-task {
+  position: relative;
+  background-color: hsl(var(--primary) / 0.15);
+  color: hsl(var(--primary));
+  font-weight: 600;
+}
+
+.study-calendar .has-study-task::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  transform: translateX(-50%);
+  border-radius: 9999px;
+  background-color: hsl(var(--primary));
+}

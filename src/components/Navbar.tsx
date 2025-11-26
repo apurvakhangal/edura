@@ -31,6 +31,7 @@ export function Navbar() {
     { label: 'Roadmap', path: '/roadmap' },
     { label: 'Notes', path: '/notes' },
     { label: 'Focus', path: '/focus' },
+    { label: 'Study Planner', path: '/study-planner' },
     { label: 'Study VR', path: '/study-vr' },
     { label: 'Community', path: '/community' },
     { label: 'Analytics', path: '/analytics' },

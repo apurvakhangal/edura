@@ -25,6 +25,7 @@ import Community from "./pages/Community";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import StudyPlanner from "./pages/StudyPlanner";
 
 const queryClient = new QueryClient();
 
@@ -131,6 +132,14 @@ const App = () => {
                     element={
                       <ProtectedRoute>
                         <Analytics />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/study-planner"
+                    element={
+                      <ProtectedRoute>
+                        <StudyPlanner />
                       </ProtectedRoute>
                     }
                   />
