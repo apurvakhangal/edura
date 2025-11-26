@@ -68,17 +68,22 @@ export function generateSchedule(tasks = []) {
 
     sortByPriority(overdueFallback).forEach((task) => {
       if (capacity <= 0) return;
-      const chunk = Math.min(task.remainingHours, capacity, MAX_CHUNK[task.priority] || 1);
-      if (chunk <= 0) return;
+      const daysLeft = Math.max(0, daysBetween(cursor, task.deadline));
+      const requiredToday = task.remainingHours / (daysLeft + 1);
+      const capacityLimit = Math.min(task.remainingHours, capacity);
+      const normalChunk = Math.min(capacityLimit, MAX_CHUNK[task.priority] || capacityLimit);
+      const chunk = Math.max(requiredToday, normalChunk);
+      const appliedChunk = Math.min(capacityLimit, chunk);
+      if (appliedChunk <= 0) return;
 
       daySchedule.push({
         task: task.name,
-        durationHours: chunk,
+        durationHours: appliedChunk,
         priority: task.priority,
       });
 
-      task.remainingHours -= chunk;
-      capacity -= chunk;
+      task.remainingHours -= appliedChunk;
+      capacity -= appliedChunk;
     });
 
     if (urgentToday && capacity >= BUFFER_HOURS) {
