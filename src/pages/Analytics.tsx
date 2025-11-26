@@ -1,10 +1,98 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { BarChart, TrendingUp, Clock, Target, Award } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import { TranslatedText } from '@/components/TranslatedText';
-import { BarChart, TrendingUp, Clock, Target, Award } from 'lucide-react';
+import { getAnalyticsData, AnalyticsData, getFallbackAnalytics } from '@/services/analyticsService';
 
 export default function Analytics() {
+  const [analytics, setAnalytics] = useState<AnalyticsData>(() => getFallbackAnalytics());
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isActive = true;
+    const loadAnalytics = async () => {
+      try {
+        const data = await getAnalyticsData();
+        if (isActive) {
+          setAnalytics(data);
+        }
+      } catch (err) {
+        if (isActive) {
+          setError(err instanceof Error ? err.message : 'Unable to load analytics right now.');
+        }
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadAnalytics();
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  const summary = analytics?.summary;
+  const hasProvisionalData = Boolean(summary);
+  const showSkeleton = loading && !hasProvisionalData;
+  const trendPoints = analytics?.weeklyTrend ?? [];
+  const trendLabels = trendPoints.length
+    ? trendPoints.map((point) => point.label)
+    : ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+  const focusEntries = analytics?.focusByDay ?? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((label) => ({ label, score: 0 }));
+  const subjectEntries = analytics?.subjects ?? [];
+  const timeBlockEntries = analytics?.timeBlocks ?? [];
+
+  const overviewCards = [
+    {
+      label: 'Study Time',
+      value: summary ? `${summary.studyHours.toFixed(1)}h` : '--',
+      delta: summary ? `${summary.studyHoursChange >= 0 ? '+' : ''}${summary.studyHoursChange}%` : '',
+      deltaLabel: 'this week',
+      deltaClass: summary && summary.studyHoursChange >= 0 ? 'text-success' : 'text-destructive',
+      icon: Clock,
+      iconBg: 'bg-primary/10',
+      iconColor: 'text-primary',
+    },
+    {
+      label: 'Focus Score',
+      value: summary ? `${summary.focusScore}%` : '--',
+      delta: summary ? `${summary.focusChange >= 0 ? '+' : ''}${summary.focusChange}%` : '',
+      deltaLabel: 'vs last week',
+      deltaClass: summary && summary.focusChange >= 0 ? 'text-success' : 'text-destructive',
+      icon: Target,
+      iconBg: 'bg-success/10',
+      iconColor: 'text-success',
+    },
+    {
+      label: 'Streak',
+      value: summary ? `${summary.streak} days` : '--',
+      delta: 'Keep it up!',
+      deltaLabel: '',
+      translateDelta: true,
+      deltaClass: 'text-muted-foreground',
+      icon: TrendingUp,
+      iconBg: 'bg-accent/10',
+      iconColor: 'text-accent',
+    },
+    {
+      label: 'Completed',
+      value: summary ? summary.completedModules.toString() : '--',
+      delta: 'modules',
+      deltaLabel: '',
+      translateDelta: true,
+      deltaClass: 'text-muted-foreground',
+      icon: Award,
+      iconBg: 'bg-destructive/10',
+      iconColor: 'text-destructive',
+    },
+  ];
+
   return (
     <div className="container mx-auto px-4 py-8">
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
@@ -14,59 +102,50 @@ export default function Analytics() {
         </div>
       </motion.div>
 
+      {error && (
+        <div className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+          {error}
+        </div>
+      )}
+
+      {!error && !loading && analytics?.isFallback && (
+        <div className="mb-4 rounded-lg border border-muted/40 bg-muted/20 p-4 text-sm text-muted-foreground">
+          Showing sample insights until you log study sessions.
+        </div>
+      )}
+
       {/* Overview Stats */}
       <div className="mb-8 grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="flex items-center gap-4 p-6">
-            <div className="rounded-full bg-primary/10 p-3">
-              <Clock className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground"><TranslatedText text="Study Time" /></p>
-              <p className="text-2xl font-bold">24.5h</p>
-              <p className="text-xs text-success">+12% <TranslatedText text="this week" /></p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="flex items-center gap-4 p-6">
-            <div className="rounded-full bg-success/10 p-3">
-              <Target className="h-6 w-6 text-success" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground"><TranslatedText text="Focus Score" /></p>
-              <p className="text-2xl font-bold">87%</p>
-              <p className="text-xs text-success">+5% <TranslatedText text="this week" /></p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="flex items-center gap-4 p-6">
-            <div className="rounded-full bg-accent/10 p-3">
-              <TrendingUp className="h-6 w-6 text-accent" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground"><TranslatedText text="Streak" /></p>
-              <p className="text-2xl font-bold">12 <TranslatedText text="days" /></p>
-              <p className="text-xs text-muted-foreground"><TranslatedText text="Keep it up!" /></p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="flex items-center gap-4 p-6">
-            <div className="rounded-full bg-destructive/10 p-3">
-              <Award className="h-6 w-6 text-destructive" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground"><TranslatedText text="Completed" /></p>
-              <p className="text-2xl font-bold">18</p>
-              <p className="text-xs text-muted-foreground"><TranslatedText text="modules" /></p>
-            </div>
-          </CardContent>
-        </Card>
+        {overviewCards.map((card) => (
+          <Card key={card.label}>
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className={`rounded-full ${card.iconBg} p-3`}>
+                <card.icon className={`h-6 w-6 ${card.iconColor}`} />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-muted-foreground">
+                  <TranslatedText text={card.label} />
+                </p>
+                {showSkeleton ? (
+                  <Skeleton className="mt-2 h-6 w-24" />
+                ) : (
+                  <p className="text-2xl font-bold">{card.value}</p>
+                )}
+                {!showSkeleton && card.delta && (
+                  <p className={`text-xs ${card.deltaClass}`}>
+                    {card.translateDelta ? <TranslatedText text={card.delta} /> : card.delta}
+                    {card.deltaLabel && (
+                      <span className="text-muted-foreground">
+                        {' '}
+                        <TranslatedText text={card.deltaLabel} />
+                      </span>
+                    )}
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Detailed Analytics */}
@@ -86,21 +165,38 @@ export default function Analytics() {
               </CardHeader>
               <CardContent>
                 <div className="flex h-64 items-end justify-around gap-2">
-                  {[20, 25, 18, 30, 24, 28, 32].map((height, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ height: 0 }}
-                      animate={{ height: `${(height / 32) * 100}%` }}
-                      transition={{ delay: i * 0.1 }}
-                      className="w-full rounded-t-lg bg-primary"
-                    />
-                  ))}
+                  {trendPoints.length > 0 &&
+                    trendPoints.map((point, i) => {
+                      const max = Math.max(...trendPoints.map((p) => p.hours), 1);
+                      const heightPercent = max ? (point.hours / max) * 100 : 0;
+                      return (
+                        <motion.div
+                          key={point.label}
+                          initial={{ height: 0 }}
+                          animate={{ height: `${heightPercent}%` }}
+                          transition={{ delay: i * 0.1 }}
+                          className="w-full rounded-t-lg bg-primary"
+                          title={`${point.hours}h`}
+                        />
+                      );
+                    })}
+                  {!trendPoints.length && showSkeleton && (
+                    <div className="flex w-full gap-2">
+                      {[...Array(4)].map((_, index) => (
+                        <Skeleton key={index} className="h-full w-full rounded" />
+                      ))}
+                    </div>
+                  )}
+                  {!trendPoints.length && !showSkeleton && (
+                    <p className="w-full text-center text-sm text-muted-foreground">
+                      Start a study session to see your weekly trend.
+                    </p>
+                  )}
                 </div>
                 <div className="mt-4 flex justify-between text-xs text-muted-foreground">
-                  <span>Week 1</span>
-                  <span>Week 2</span>
-                  <span>Week 3</span>
-                  <span>Week 4</span>
+                  {trendLabels.map((label) => (
+                    <span key={label}>{label}</span>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -112,25 +208,30 @@ export default function Analytics() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day, i) => {
-                    const score = [85, 92, 78, 88, 95][i];
-                    return (
-                      <div key={day}>
-                        <div className="mb-1 flex justify-between text-sm">
-                          <span>{day}</span>
-                          <span className="font-semibold">{score}%</span>
-                        </div>
-                        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                  {focusEntries.map((entry, i) => (
+                    <div key={entry.label}>
+                      <div className="mb-1 flex justify-between text-sm">
+                        <span>{entry.label}</span>
+                        {showSkeleton && !analytics ? (
+                          <Skeleton className="h-3 w-12" />
+                        ) : (
+                          <span className="font-semibold">{entry.score}%</span>
+                        )}
+                      </div>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                        {showSkeleton && !analytics ? (
+                          <Skeleton className="h-2 w-full rounded-full" />
+                        ) : (
                           <motion.div
                             initial={{ width: 0 }}
-                            animate={{ width: `${score}%` }}
+                            animate={{ width: `${entry.score}%` }}
                             transition={{ delay: i * 0.1 }}
                             className="h-full bg-gradient-accent"
                           />
-                        </div>
+                        )}
                       </div>
-                    );
-                  })}
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -145,12 +246,7 @@ export default function Analytics() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {[
-                  { name: 'React', score: 92, color: 'bg-primary' },
-                  { name: 'JavaScript', score: 88, color: 'bg-accent' },
-                  { name: 'TypeScript', score: 75, color: 'bg-success' },
-                  { name: 'Algorithms', score: 65, color: 'bg-destructive' },
-                ].map((subject, i) => (
+                {subjectEntries.map((subject, i) => (
                   <motion.div
                     key={subject.name}
                     initial={{ opacity: 0, x: -20 }}
@@ -166,11 +262,14 @@ export default function Analytics() {
                         initial={{ width: 0 }}
                         animate={{ width: `${subject.score}%` }}
                         transition={{ delay: i * 0.1 + 0.2 }}
-                        className={`h-full ${subject.color}`}
+                        className={`h-full ${subject.colorClass}`}
                       />
                     </div>
                   </motion.div>
                 ))}
+                {subjectEntries.length === 0 && (
+                  <p className="text-sm text-muted-foreground">Log some course progress to see subject performance.</p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -184,27 +283,23 @@ export default function Analytics() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between rounded-lg bg-success/10 p-4">
-                  <div>
-                    <p className="font-semibold"><TranslatedText text="Morning (8 AM - 12 PM)" /></p>
-                    <p className="text-sm text-muted-foreground"><TranslatedText text="Your peak performance time" /></p>
+                {timeBlockEntries.map((block) => (
+                  <div
+                    key={block.label}
+                    className={`flex items-center justify-between rounded-lg p-4 ${block.bgClass}`}
+                  >
+                    <div>
+                      <p className="font-semibold"><TranslatedText text={block.label} /></p>
+                      <p className="text-sm text-muted-foreground">{block.description}</p>
+                    </div>
+                    <div className={`text-2xl font-bold ${block.textClass}`}>{block.score}%</div>
                   </div>
-                  <div className="text-2xl font-bold text-success">92%</div>
-                </div>
-                <div className="flex items-center justify-between rounded-lg bg-primary/10 p-4">
-                  <div>
-                    <p className="font-semibold"><TranslatedText text="Afternoon (12 PM - 5 PM)" /></p>
-                    <p className="text-sm text-muted-foreground"><TranslatedText text="Good focus levels" /></p>
+                ))}
+                {timeBlockEntries.length === 0 && (
+                  <div className="rounded-lg bg-muted p-4 text-sm text-muted-foreground">
+                    We'll highlight your most productive hours once we detect enough study sessions.
                   </div>
-                  <div className="text-2xl font-bold text-primary">78%</div>
-                </div>
-                <div className="flex items-center justify-between rounded-lg bg-muted p-4">
-                  <div>
-                    <p className="font-semibold"><TranslatedText text="Evening (5 PM - 10 PM)" /></p>
-                    <p className="text-sm text-muted-foreground"><TranslatedText text="Lower concentration" /></p>
-                  </div>
-                  <div className="text-2xl font-bold text-muted-foreground">65%</div>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>
