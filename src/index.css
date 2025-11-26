@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Light Mode - Cosmic Clean */
+    --background: 220 25% 97%;
+    --foreground: 240 20% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 20% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 20% 15%;
+
+    --primary: 250 85% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 240 20% 15%;
+
+    --muted: 220 15% 92%;
+    --muted-foreground: 240 10% 45%;
+
+    --accent: 190 95% 55%;
+    --accent-foreground: 240 20% 15%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 45 93% 58%;
+    --success-foreground: 240 20% 15%;
+
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 250 85% 60%;
+
+    --radius: 0.75rem;
+
+    /* Cosmic gradients */
+    --gradient-cosmic: linear-gradient(135deg, hsl(250, 85%, 60%), hsl(280, 80%, 65%));
+    --gradient-accent: linear-gradient(135deg, hsl(190, 95%, 55%), hsl(210, 90%, 60%));
+    --gradient-success: linear-gradient(135deg, hsl(45, 93%, 58%), hsl(35, 90%, 55%));
+
+    /* Glows and effects */
+    --glow-primary: 0 8px 32px hsl(250 85% 60% / 0.3);
+    --glow-accent: 0 8px 32px hsl(190 95% 55% / 0.3);
+
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    /* Dark Mode - Deep Space */
+    --background: 240 25% 8%;
+    --foreground: 220 15% 95%;
+
+    --card: 240 20% 12%;
+    --card-foreground: 220 15% 95%;
+
+    --popover: 240 20% 12%;
+    --popover-foreground: 220 15% 95%;
+
+    --primary: 250 85% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 15% 18%;
+    --secondary-foreground: 220 15% 95%;
+
+    --muted: 240 15% 15%;
+    --muted-foreground: 220 10% 60%;
+
+    --accent: 190 95% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 45 93% 58%;
+    --success-foreground: 240 20% 15%;
+
+    --border: 240 15% 20%;
+    --input: 240 15% 20%;
+    --ring: 250 85% 65%;
+  }
+
+  .colorblind {
+    /* Color-blind Safe Mode */
+    --primary: 210 100% 50%;
+    --accent: 35 100% 50%;
+    --success: 160 100% 35%;
+    --destructive: 0 0% 20%;
+    --muted: 45 100% 65%;
+  }
+
+  .dyslexia {
+    /* Applied via body class for font changes */
+    font-family: 'OpenDyslexic', 'Atkinson Hyperlegible', sans-serif;
+    letter-spacing: 0.05em;
+    line-height: 1.7;
+    word-spacing: 0.12em;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Dyslexia font loading */
+  @font-face {
+    font-family: 'OpenDyslexic';
+    src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/ttf/OpenDyslexic-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+}
+
+@layer utilities {
+  .gradient-cosmic {
+    background: var(--gradient-cosmic);
+  }
+
+  .gradient-accent {
+    background: var(--gradient-accent);
+  }
+
+  .gradient-success {
+    background: var(--gradient-success);
+  }
+
+  .glow-primary {
+    box-shadow: var(--glow-primary);
+  }
+
+  .glow-accent {
+    box-shadow: var(--glow-accent);
+  }
+
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
