@@ -3,7 +3,14 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
-const formatISO = (date) => date.toISOString().split('T')[0];
+const toLocalISO = (date) => {
+  const copy = new Date(date);
+  copy.setHours(0, 0, 0, 0);
+  const year = copy.getFullYear();
+  const month = String(copy.getMonth() + 1).padStart(2, '0');
+  const day = String(copy.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 function ScheduleCalendar({ schedule = [], onDateSelect }) {
   const taskMap = useMemo(() => {
@@ -18,13 +25,13 @@ function ScheduleCalendar({ schedule = [], onDateSelect }) {
 
   const tileClassName = ({ date, view }) => {
     if (view !== 'month') return undefined;
-    const iso = formatISO(date);
+    const iso = toLocalISO(date);
     return taskMap.has(iso) ? 'has-study-task' : undefined;
   };
 
   const tileContent = ({ date, view }) => {
     if (view !== 'month') return null;
-    const iso = formatISO(date);
+    const iso = toLocalISO(date);
     const tasksForDay = taskMap.get(iso);
     if (!tasksForDay || tasksForDay.length === 0) return null;
     return (
@@ -33,7 +40,7 @@ function ScheduleCalendar({ schedule = [], onDateSelect }) {
   };
 
   const handleDayClick = (value) => {
-    const iso = formatISO(value);
+    const iso = toLocalISO(value);
     onDateSelect?.(iso, taskMap.get(iso) || []);
   };
 

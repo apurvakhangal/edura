@@ -170,6 +170,25 @@ All colors MUST be HSL.
   font-family: inherit;
 }
 
+.study-calendar .react-calendar__navigation {
+  margin-bottom: 1rem;
+  padding: 0.25rem;
+  border-radius: var(--radius);
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+}
+
+.study-calendar .react-calendar__navigation button {
+  color: hsl(var(--foreground));
+  font-weight: 600;
+  background: transparent;
+  border-radius: calc(var(--radius) / 2);
+}
+
+.study-calendar .react-calendar__navigation button:enabled:hover {
+  background-color: hsl(var(--secondary) / 0.4);
+}
+
 .study-calendar .react-calendar__tile {
   border-radius: 0.75rem;
   min-height: 64px;
@@ -198,4 +217,15 @@ All colors MUST be HSL.
   transform: translateX(-50%);
   border-radius: 9999px;
   background-color: hsl(var(--primary));
+}
+
+/* Ensure native picker icons stay visible on dark backgrounds */
+.dark input[type='date']::-webkit-calendar-picker-indicator,
+.dark input[type='time']::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+.dark input[type='date']::-moz-focus-inner,
+.dark input[type='time']::-moz-focus-inner {
+  filter: invert(1);
 }

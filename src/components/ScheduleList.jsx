@@ -24,7 +24,7 @@ function ScheduleList({ schedule = [] }) {
       {schedule.map((day) => (
         <Card key={day.date}>
           <CardHeader className="flex flex-col gap-1 pb-2">
-            <CardTitle className="text-lg">{new Date(day.date).toLocaleDateString(undefined, {
+            <CardTitle className="text-lg">{new Date(`${day.date}T00:00:00`).toLocaleDateString(undefined, {
               weekday: 'long',
               month: 'short',
               day: 'numeric',

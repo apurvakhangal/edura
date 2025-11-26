@@ -23,6 +23,17 @@ const createId = () =>
     ? crypto.randomUUID()
     : Math.random().toString(36).slice(2);
 
+const formatLocalDateLabel = (isoDate) => {
+  if (!isoDate) return 'selected day';
+  const date = new Date(`${isoDate}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return 'selected day';
+  return date.toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+  });
+};
+
 const StudyPlanner = () => {
   const [tasks, setTasks] = useState([]);
   const [schedule, setSchedule] = useState([]);
@@ -69,6 +80,8 @@ const StudyPlanner = () => {
     setSelectedDate(iso);
     setSelectedTasks(dayTasks);
   };
+
+  const selectedHeading = formatLocalDateLabel(selectedDate);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -119,7 +132,7 @@ const StudyPlanner = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Tasks on {selectedDate ? new Date(selectedDate).toLocaleDateString() : 'selected day'}</CardTitle>
+              <CardTitle>Tasks on {selectedHeading}</CardTitle>
               <CardDescription>
                 Click any date in the calendar to inspect its workload.
               </CardDescription>
@@ -128,7 +141,9 @@ const StudyPlanner = () => {
               {selectedTasks.length === 0 ? (
                 <div className="flex items-center gap-2 rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
                   <AlertCircle className="h-4 w-4" />
-                  No study blocks scheduled for this day yet.
+                  {selectedDate
+                    ? 'No study blocks scheduled for this day yet.'
+                    : 'Pick a day on the calendar to preview its focus blocks.'}
                 </div>
               ) : (
                 selectedTasks.map((task, index) => (

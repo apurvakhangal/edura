@@ -11,7 +11,13 @@ const toStartOfDay = (value) => {
   return day;
 };
 
-const formatISODate = (value) => toStartOfDay(value).toISOString().split('T')[0];
+const formatISODate = (value) => {
+  const day = toStartOfDay(value);
+  const year = day.getFullYear();
+  const month = String(day.getMonth() + 1).padStart(2, '0');
+  const date = String(day.getDate()).padStart(2, '0');
+  return `${year}-${month}-${date}`;
+};
 
 const daysBetween = (from, to) => Math.ceil((toStartOfDay(to) - toStartOfDay(from)) / MS_IN_DAY);
 

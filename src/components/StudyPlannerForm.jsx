@@ -18,10 +18,17 @@ const PRIORITY_OPTIONS = [
   { label: 'Low', value: 'low', badge: 'bg-emerald-500/15 text-emerald-600' },
 ];
 
+const todayISODate = () => {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return now.toISOString().split('T')[0];
+};
+
 function StudyPlannerForm({ onAddTask, onGenerateSchedule, tasks = [] }) {
   const [formState, setFormState] = useState({
     name: '',
-    deadline: '',
+    deadlineDate: todayISODate(),
+    deadlineTime: '18:00',
     estimatedHours: '1.5',
     priority: 'medium',
   });
@@ -33,19 +40,29 @@ function StudyPlannerForm({ onAddTask, onGenerateSchedule, tasks = [] }) {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (!formState.name.trim() || !formState.deadline) {
+    if (!formState.name.trim() || !formState.deadlineDate) {
       return;
     }
+
+    const composedDeadline = new Date(
+      `${formState.deadlineDate}T${formState.deadlineTime || '23:59'}`
+    );
 
     const parsedHours = Math.max(0.5, Number(formState.estimatedHours));
     onAddTask?.({
       name: formState.name.trim(),
-      deadline: formState.deadline,
+      deadline: composedDeadline.toISOString(),
       estimatedHours: parsedHours,
       priority: formState.priority,
     });
 
-    setFormState((prev) => ({ ...prev, name: '', estimatedHours: '1.5' }));
+    setFormState((prev) => ({
+      ...prev,
+      name: '',
+      estimatedHours: '1.5',
+      deadlineDate: todayISODate(),
+      deadlineTime: '18:00',
+    }));
   };
 
   const handleGenerateClick = () => {
@@ -76,13 +93,23 @@ function StudyPlannerForm({ onAddTask, onGenerateSchedule, tasks = [] }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="deadline">Deadline</Label>
+            <Label htmlFor="deadlineDate">Deadline date</Label>
             <Input
-              id="deadline"
-              type="datetime-local"
-              value={formState.deadline}
-              onChange={(event) => updateField('deadline', event.target.value)}
-              min={new Date().toISOString().slice(0, 16)}
+              id="deadlineDate"
+              type="date"
+              value={formState.deadlineDate}
+              min={todayISODate()}
+              onChange={(event) => updateField('deadlineDate', event.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="deadlineTime">Deadline time</Label>
+            <Input
+              id="deadlineTime"
+              type="time"
+              value={formState.deadlineTime}
+              onChange={(event) => updateField('deadlineTime', event.target.value)}
             />
           </div>
 
@@ -114,11 +141,20 @@ function StudyPlannerForm({ onAddTask, onGenerateSchedule, tasks = [] }) {
             </Select>
           </div>
 
-          <div className="md:col-span-2 flex flex-wrap gap-3">
-            <Button type="submit">Add Task</Button>
+          <div className="flex flex-col justify-end">
+            <span className="text-sm font-medium text-transparent" aria-hidden>
+              Add Task
+            </span>
+            <Button type="submit" className="w-full">
+              Add Task
+            </Button>
+          </div>
+
+          <div className="md:col-span-2">
             <Button
               type="button"
               variant="outline"
+              className="w-full"
               onClick={handleGenerateClick}
               disabled={tasks.length === 0}
             >
