@@ -1,11 +1,5 @@
 import { supabase } from '@/lib/supabase';
 import { getCurrentUserId } from '@/lib/auth';
-import {
-  generateCourseOutline,
-  type CourseGenerationInput,
-  type GeneratedCourseOutline,
-  type GeneratedCourseModule,
-} from '@/lib/gemini';
 
 export interface Course {
   id: string;
@@ -421,116 +415,6 @@ export async function getExternalCourses(source?: 'udemy' | 'coursera') {
       courses: [], 
       error: error.message || 'Failed to fetch external courses. Make sure the backend server is running on port 3001.' 
     };
-  }
-}
-
-function normalizeModuleContent(module: GeneratedCourseModule, moduleNumber: number) {
-  const lessonNarrative = module.lessonNarrative?.trim();
-  const textBlock = lessonNarrative
-    ? [
-        {
-          type: 'text',
-          content: lessonNarrative,
-        },
-      ]
-    : undefined;
-
-  return {
-    module_number: moduleNumber,
-    title: module.title || `Module ${moduleNumber}`,
-    summary: module.summary || 'Module overview',
-    content: {
-      lessonNarrative,
-      lessonHighlights: module.lessonHighlights,
-      keyConcepts: module.keyConcepts,
-      topics: module.topics,
-      activities: module.activities,
-      project: module.project,
-      resources: module.resources,
-      ideSetup: module.ideSetup,
-      concepts: module.keyConcepts,
-      content_blocks: textBlock,
-    },
-    time_required: Math.max(1, Math.round(module.estimatedHours || 4)),
-    flashcards: module.flashcards || [],
-    practice_tasks: module.practiceTasks || [],
-    quiz: { questions: module.quizQuestions || [] },
-  };
-}
-
-export interface GenerateCourseResponse {
-  course: Course | null;
-  modules: Module[] | null;
-  outline?: GeneratedCourseOutline;
-  error: string | null;
-}
-
-export async function generateAICourse(input: CourseGenerationInput): Promise<GenerateCourseResponse> {
-  try {
-    const userId = await getCurrentUserId();
-    if (!userId) {
-      throw new Error('You must be logged in to generate a course.');
-    }
-
-    const outline = await generateCourseOutline(input);
-    const totalModules = outline.modules.length;
-    const estimatedHours = outline.estimatedHours || outline.modules.reduce((sum, module) => sum + (module.estimatedHours || 4), 0);
-
-    const { data: course, error: courseError } = await supabase
-      .from('courses')
-      .insert({
-        owner_id: userId,
-        title: outline.title,
-        description: outline.description,
-        primary_language: outline.language || 'en',
-        level: outline.level,
-        tags: outline.tags || [],
-        duration_days: input.durationWeeks * 7,
-        category: outline.category || input.category,
-        estimated_hours: estimatedHours,
-        total_modules: totalModules,
-        is_ai_generated: true,
-        published: false,
-        meta: {
-          goal: input.goal,
-          audience: input.audience,
-          focusArea: input.focusArea,
-          preferredLanguage: input.preferredLanguage,
-          learningObjectives: outline.learningObjectives,
-          generator: 'gemini-course-v1',
-          includeIDE: Boolean(input.includeIDE),
-        },
-      })
-      .select()
-      .single();
-
-    if (courseError) {
-      throw courseError;
-    }
-
-    const modulesPayload = outline.modules.map((module, index) => ({
-      ...normalizeModuleContent(module, index + 1),
-      course_id: course.id,
-    }));
-
-    const { data: insertedModules, error: modulesError } = await supabase
-      .from('modules')
-      .insert(modulesPayload)
-      .select();
-
-    if (modulesError) {
-      throw modulesError;
-    }
-
-    return {
-      course: course as Course,
-      modules: insertedModules as Module[],
-      outline,
-      error: null,
-    };
-  } catch (error: any) {
-    console.error('Error generating AI course:', error);
-    return { course: null, modules: null, outline: undefined, error: error.message || 'Failed to generate AI course.' };
   }
 }
 

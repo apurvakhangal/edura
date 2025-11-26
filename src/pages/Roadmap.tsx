@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
@@ -38,8 +37,6 @@ export default function Roadmap() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'role' | 'skill' | 'beginner'>('all');
   const [isLoadingRoadmaps, setIsLoadingRoadmaps] = useState(true);
-  const [selectedRoadmap, setSelectedRoadmap] = useState<RoadmapItem | null>(null);
-  const [isRoadmapDialogOpen, setIsRoadmapDialogOpen] = useState(false);
   
   // Questionnaire state
   const [questionStep, setQuestionStep] = useState(1);
@@ -282,15 +279,7 @@ export default function Roadmap() {
   };
 
   const handleViewRoadmap = (roadmap: RoadmapItem) => {
-    setSelectedRoadmap(roadmap);
-    setIsRoadmapDialogOpen(true);
-  };
-
-  const closeRoadmapDialog = (open: boolean) => {
-    setIsRoadmapDialogOpen(open);
-    if (!open) {
-      setSelectedRoadmap(null);
-    }
+    window.open(roadmap.url, '_blank');
   };
 
   return (
@@ -1019,45 +1008,6 @@ export default function Roadmap() {
           )}
         </TabsContent>
       </Tabs>
-
-      <Dialog open={isRoadmapDialogOpen} onOpenChange={closeRoadmapDialog}>
-        <DialogContent className="max-w-5xl">
-          <DialogHeader>
-            <DialogTitle>{selectedRoadmap?.title || 'Roadmap Preview'}</DialogTitle>
-            {selectedRoadmap?.description && (
-              <DialogDescription>{selectedRoadmap.description}</DialogDescription>
-            )}
-          </DialogHeader>
-          {selectedRoadmap?.url ? (
-            <div className="h-[70vh] overflow-hidden rounded-lg border">
-              <iframe
-                src={selectedRoadmap.url}
-                title={selectedRoadmap.title}
-                className="h-full w-full"
-                loading="lazy"
-              />
-            </div>
-          ) : (
-            <Card>
-              <CardContent className="p-6 text-center text-sm text-muted-foreground">
-                This roadmap preview is unavailable.
-              </CardContent>
-            </Card>
-          )}
-          {selectedRoadmap?.url && (
-            <div className="flex justify-end">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => selectedRoadmap && window.open(selectedRoadmap.url, '_blank')}
-              >
-                Open in new tab
-                <ExternalLink className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

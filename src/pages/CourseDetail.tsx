@@ -31,47 +31,6 @@ import { useUserStore } from '@/store/userStore';
 import IDE from '@/components/IDE';
 import DiscussionForum from '@/components/DiscussionForum';
 
-function isInternalCourse(course: Course | ExternalCourse | null): course is Course {
-  return Boolean(course && 'meta' in course);
-}
-
-function isExternalCatalogCourse(course: Course | ExternalCourse | null): course is ExternalCourse {
-  return Boolean(course && 'provider' in course);
-}
-
-function getYouTubeEmbedUrl(rawUrl?: string): string | null {
-  if (!rawUrl) {
-    return null;
-  }
-
-  try {
-    const parsed = new URL(rawUrl);
-    const host = parsed.hostname.replace(/^www\./, '');
-    const pathSegments = parsed.pathname.split('/').filter(Boolean);
-
-    let videoId = parsed.searchParams.get('v');
-
-    if (!videoId && host === 'youtu.be' && pathSegments.length) {
-      videoId = pathSegments[0];
-    }
-
-    if (!videoId && (host.includes('youtube.com') || host.includes('youtube-nocookie.com'))) {
-      if (pathSegments[0] === 'shorts' && pathSegments[1]) {
-        videoId = pathSegments[1];
-      } else if (['embed', 'v'].includes(pathSegments[0]) && pathSegments[1]) {
-        videoId = pathSegments[1];
-      } else if (pathSegments.length) {
-        videoId = pathSegments[pathSegments.length - 1];
-      }
-    }
-
-    return videoId ? `https://www.youtube.com/embed/${encodeURIComponent(videoId)}` : null;
-  } catch (error) {
-    console.debug('Unable to parse YouTube URL', error);
-    return null;
-  }
-}
-
 export default function CourseDetail() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
@@ -87,14 +46,6 @@ export default function CourseDetail() {
   const [level, setLevel] = useState(user?.level || 1);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'content' | 'ide' | 'discussion'>('content');
-  const internalCourse = isInternalCourse(course) ? course : null;
-  const externalCourse = isExternalCatalogCourse(course) ? course : null;
-  const modulesOfferIde = modules.some((module) => Boolean(module.content?.ideSetup));
-  const showIdeTab = Boolean(
-    modulesOfferIde ||
-      (internalCourse?.meta?.includeIDE) ||
-      (externalCourse && (externalCourse.is_tech || externalCourse.category === 'coding' || externalCourse.category === 'tech'))
-  );
 
   useEffect(() => {
     loadCourse();
@@ -1361,6 +1312,8 @@ if __name__ == "__main__":
     window.dispatchEvent(new CustomEvent('dashboard-refresh'));
   };
 
+  const isTechCourse = course && ('is_tech' in course ? course.is_tech : course.category === 'coding' || course.category === 'tech');
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -1524,7 +1477,7 @@ if __name__ == "__main__":
                 <BookOpen className="mr-2 h-4 w-4" />
                 Content
               </TabsTrigger>
-              {showIdeTab && (
+              {isTechCourse && (
                 <TabsTrigger value="ide">
                   <Code className="mr-2 h-4 w-4" />
                   IDE
@@ -1572,21 +1525,6 @@ if __name__ == "__main__":
                       </div>
                     )}
 
-                    {/* Lesson Highlights */}
-                    {currentModule.content.lessonHighlights && currentModule.content.lessonHighlights.length > 0 && (
-                      <div>
-                        <h3 className="text-lg font-semibold mb-3">Lesson Highlights</h3>
-                        <ul className="grid gap-2 md:grid-cols-2">
-                          {currentModule.content.lessonHighlights.map((highlight: string, idx: number) => (
-                            <li key={idx} className="flex items-start gap-2 rounded-lg border p-3 text-sm">
-                              <Award className="h-4 w-4 text-primary mt-0.5" />
-                              <span>{highlight}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
                     {/* Content Blocks */}
                     {currentModule.content.content_blocks && (
                       <div>
@@ -1627,16 +1565,6 @@ if __name__ == "__main__":
                       </div>
                     )}
 
-                    {/* Lesson Narrative */}
-                    {currentModule.content.lessonNarrative && !currentModule.content.content_blocks && (
-                      <div>
-                        <h3 className="text-lg font-semibold mb-3">Guided Lesson</h3>
-                        <p className="whitespace-pre-wrap text-muted-foreground">
-                          {currentModule.content.lessonNarrative}
-                        </p>
-                      </div>
-                    )}
-
                     {/* Examples */}
                     {currentModule.content.examples && currentModule.content.examples.length > 0 && (
                       <div>
@@ -1649,84 +1577,6 @@ if __name__ == "__main__":
                               </CardContent>
                             </Card>
                           ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Learning Activities */}
-                    {currentModule.content.activities && currentModule.content.activities.length > 0 && (
-                      <div>
-                        <h3 className="text-lg font-semibold mb-3">Learning Activities</h3>
-                        <div className="space-y-3">
-                          {currentModule.content.activities.map((activity: string, idx: number) => (
-                            <Card key={idx} className="bg-muted/40">
-                              <CardContent className="p-4 text-sm">
-                                {activity}
-                              </CardContent>
-                            </Card>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Resources */}
-                    {currentModule.content.resources && currentModule.content.resources.length > 0 && (
-                      <div>
-                        <h3 className="text-lg font-semibold mb-3">Resources & References</h3>
-                        <div className="grid gap-4 md:grid-cols-2">
-                          {currentModule.content.resources.map((resource: any, idx: number) => {
-                            const isVideo = resource.type && resource.type.toLowerCase() === 'video';
-                            const embedUrl = isVideo ? getYouTubeEmbedUrl(resource.url) : null;
-
-                            return (
-                              <Card key={idx}>
-                                <CardContent className="p-4 space-y-3">
-                                  {isVideo && embedUrl && (
-                                    <div className="aspect-video w-full overflow-hidden rounded-lg border">
-                                      <iframe
-                                        src={embedUrl}
-                                        title={resource.title || 'Lesson video'}
-                                        className="h-full w-full"
-                                        loading="lazy"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowFullScreen
-                                      />
-                                    </div>
-                                  )}
-                                  <div className="flex items-center justify-between">
-                                    <h4 className="font-semibold text-base">{resource.title}</h4>
-                                    {resource.type && <Badge variant="outline">{resource.type}</Badge>}
-                                  </div>
-                                  {resource.description && (
-                                    <p className="text-sm text-muted-foreground">{resource.description}</p>
-                                  )}
-                                  {(!isVideo || !embedUrl) && resource.url && (
-                                    <a
-                                      href={resource.url}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                      className="text-sm font-medium text-primary hover:underline"
-                                    >
-                                      Open resource ↗
-                                    </a>
-                                  )}
-                                  {isVideo && resource.url && (
-                                    <p className="text-xs text-muted-foreground">
-                                      Prefer to watch on YouTube?
-                                      <a
-                                        className="ml-1 text-primary hover:underline"
-                                        href={resource.url}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                      >
-                                        Open in new tab ↗
-                                      </a>
-                                    </p>
-                                  )}
-                                </CardContent>
-                              </Card>
-                            );
-                          })}
                         </div>
                       </div>
                     )}
@@ -1782,21 +1632,8 @@ if __name__ == "__main__":
               )}
             </TabsContent>
 
-            {showIdeTab && (
+            {isTechCourse && (
               <TabsContent value="ide" className="mt-6">
-                {currentModule?.content?.ideSetup && (
-                  <Card className="mb-4">
-                    <CardHeader>
-                      <CardTitle>Module IDE Setup</CardTitle>
-                      <CardDescription>{currentModule.content.ideSetup.tool}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="whitespace-pre-wrap text-sm text-muted-foreground">
-                        {currentModule.content.ideSetup.instructions}
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
                 <IDE courseId={courseId!} moduleNumber={activeModule} />
               </TabsContent>
             )}
