@@ -6,6 +6,7 @@ Edura is a comprehensive, AI-powered learning platform designed to make educatio
 
 ### Core Features
 - **AI Study Assistant**: Interactive chatbot powered by Google Gemini AI for instant help and explanations
+- **AI-Generated Courses**: Build end-to-end curricula with AI-crafted modules, projects, quizzes, and flashcards
 - **Smart Learning Roadmaps**: AI-generated personalized learning paths based on your goals, skill level, and timeline
 - **Gamified Learning**: Earn XP, level up, maintain streaks, and compete on leaderboards
 - **Focus Room**: Pomodoro-style focus sessions with ambient sounds and progress tracking
@@ -46,7 +47,7 @@ Edura is a comprehensive, AI-powered learning platform designed to make educatio
 - **Storage**: Supabase Storage
 - **API**: Express.js server for external course fetching
 - **AI Services**:
-  - Google Gemini AI (chat, summaries, flashcards, quizzes, roadmaps)
+  - Google Gemini AI (course generation, chat, summaries, flashcards, quizzes, roadmaps)
   - RapidAPI Deep Translate (multi-language support)
 
 ### Project Structure
@@ -124,6 +125,7 @@ The application uses Supabase (PostgreSQL) with the following main tables:
 - **courses**: Course metadata
   - Title, description, level, category
   - Multi-language support (JSONB)
+  - AI-generated flag for Gemini-built drafts
   - Published status
 
 - **modules**: Course modules
@@ -292,6 +294,15 @@ Public routes:
   - Timeline (days/weeks/months)
   - Time commitment
   - Learning goals
+
+### AI Course Builder
+- Launch from the **Courses** page and answer a short questionnaire
+- Gemini assembles:
+  - Modules paced to your duration and level
+  - Teaching highlights, practice tasks, flashcards, and quizzes per module
+  - Suggested projects/resources when "include projects" is enabled
+- Coding topics automatically include IDE setup guidance (local + browser-based)
+- Generated drafts appear under “My Courses” as unpublished entries so you can review, edit, and publish later
 
 ### Focus Room
 - Pomodoro timer with customizable durations
