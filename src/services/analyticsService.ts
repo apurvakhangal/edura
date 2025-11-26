@@ -111,19 +111,54 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
       }
     }
 
+    const fallback = getFallbackAnalytics();
     const summary = buildSummaryMetrics(sessions || [], progressRows || [], userRow?.streak || 0, today);
     const weeklyTrend = buildWeeklyTrend(sessions || [], today);
     const focusByDay = buildFocusByDay(sessions || [], today);
     const timeBlocks = buildTimeBlocks(sessions || []);
     const subjects = buildSubjectPerformance(progressRows || [], courseMap);
 
+    const hasStudySessions = Boolean(sessions && sessions.length);
+    const hasMeaningfulTrend = weeklyTrend.some((point) => point.hours > 0);
+    const hasFocusData = focusByDay.some((entry) => entry.score > 0);
+    const hasTimeInsights = timeBlocks.some((block) => block.score > 0);
+    const hasProgressData = Boolean(
+      progressRows &&
+        progressRows.some((row) => (row.completed_modules || 0) > 0 || (row.progress_percentage || 0) > 0),
+    );
+    const hasSubjectInsights = subjects.length > 0 && subjects.some((subject) => subject.score > 0);
+
+    const mergedSummary = { ...summary };
+
+    if (!hasStudySessions) {
+      mergedSummary.studyHours = fallback.summary.studyHours;
+      mergedSummary.studyHoursChange = fallback.summary.studyHoursChange;
+      mergedSummary.focusScore = fallback.summary.focusScore;
+      mergedSummary.focusChange = fallback.summary.focusChange;
+    }
+
+    if (!mergedSummary.streak) {
+      mergedSummary.streak = fallback.summary.streak;
+    }
+
+    if (!hasProgressData && mergedSummary.completedModules === 0) {
+      mergedSummary.completedModules = fallback.summary.completedModules;
+    }
+
+    const mergedTrend = hasStudySessions && hasMeaningfulTrend ? weeklyTrend : fallback.weeklyTrend;
+    const mergedFocus = hasStudySessions && hasFocusData ? focusByDay : fallback.focusByDay;
+    const mergedTimeBlocks = hasStudySessions && hasTimeInsights ? timeBlocks : fallback.timeBlocks;
+    const mergedSubjects = hasSubjectInsights ? subjects : fallback.subjects;
+
+    const isStillFallback = !hasStudySessions && !hasProgressData;
+
     return {
-      summary,
-      weeklyTrend,
-      focusByDay,
-      timeBlocks,
-      subjects,
-      isFallback: false,
+      summary: mergedSummary,
+      weeklyTrend: mergedTrend,
+      focusByDay: mergedFocus,
+      timeBlocks: mergedTimeBlocks,
+      subjects: mergedSubjects,
+      isFallback: isStillFallback,
     };
   } catch (error) {
     console.warn('Falling back to sample analytics data:', error);
