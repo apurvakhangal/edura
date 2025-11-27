@@ -220,6 +220,43 @@ const generateFallbackSound = (audioContext: AudioContext, type: SoundType): Aud
   return source;
 };
 
+const createAudioElement = (url: string, volume: number, muted: boolean) => {
+  return new Promise<HTMLAudioElement>((resolve, reject) => {
+    const audio = new Audio();
+    audio.src = url;
+    audio.loop = true;
+    audio.preload = 'auto';
+    audio.crossOrigin = 'anonymous';
+    audio.volume = muted ? 0 : volume;
+
+    const cleanup = () => {
+      audio.removeEventListener('canplaythrough', onReady);
+      audio.removeEventListener('error', onError);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+
+    const onReady = () => {
+      cleanup();
+      resolve(audio);
+    };
+
+    const onError = () => {
+      cleanup();
+      reject(new Error(`Failed to load audio: ${url}`));
+    };
+
+    audio.addEventListener('canplaythrough', onReady);
+    audio.addEventListener('error', onError);
+    audio.load();
+    const timeoutId = window.setTimeout(() => {
+      cleanup();
+      reject(new Error(`Audio load timed out: ${url}`));
+    }, 5000);
+  });
+};
+
 export const useSoundPlayer = (): UseSoundPlayerReturn => {
   const [currentSound, setCurrentSound] = useState<SoundType>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -229,6 +266,7 @@ export const useSoundPlayer = (): UseSoundPlayerReturn => {
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
   const [frequencyData, setFrequencyData] = useState<Uint8Array | null>(null);
   const [useFallback, setUseFallback] = useState(false);
+  const availabilityCacheRef = useRef<Record<string, boolean>>({});
 
   const sourceRef = useRef<AudioBufferSourceNode | null>(null);
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
@@ -310,6 +348,20 @@ export const useSoundPlayer = (): UseSoundPlayerReturn => {
     };
   }, [analyser, frequencyData, isPlaying]);
 
+  const checkAudioAvailability = useCallback(async (url: string) => {
+    if (availabilityCacheRef.current[url] !== undefined) {
+      return availabilityCacheRef.current[url];
+    }
+    try {
+      const response = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+      availabilityCacheRef.current[url] = response.ok;
+      return response.ok;
+    } catch (error) {
+      availabilityCacheRef.current[url] = false;
+      return false;
+    }
+  }, []);
+
   const playSound = useCallback(
     async (sound: SoundType) => {
       if (!audioContext || !analyser || !gainNodeRef.current) return;
@@ -353,29 +405,15 @@ export const useSoundPlayer = (): UseSoundPlayerReturn => {
       // Try to load from URLs first
       if (urls && urls.length > 0) {
         for (const url of urls) {
+          const available = await checkAudioAvailability(url);
+          if (!available) {
+            continue;
+          }
           try {
-            const audio = new Audio(url);
-            audio.loop = true;
-            audio.volume = isMuted ? 0 : volume;
-            
-            await new Promise<void>((resolve, reject) => {
-              audio.addEventListener('canplaythrough', () => {
-                resolve();
-              });
-              audio.addEventListener('error', () => {
-                reject(new Error('Failed to load audio'));
-              });
-              audio.load();
-              
-              // Timeout after 3 seconds
-              setTimeout(() => reject(new Error('Timeout')), 3000);
-            });
-
-            // Successfully loaded
-            audio.play();
+            const audio = await createAudioElement(url, volume, isMuted);
+            await audio.play();
             audioElementRef.current = audio;
 
-            // Connect to analyser for visualization
             const mediaSource = audioContext.createMediaElementSource(audio);
             mediaSource.connect(gainNodeRef.current);
             mediaSourceRef.current = mediaSource;
@@ -384,7 +422,7 @@ export const useSoundPlayer = (): UseSoundPlayerReturn => {
             setUseFallback(false);
             break;
           } catch (error) {
-            // Try next URL
+            console.warn(error);
             continue;
           }
         }
@@ -407,7 +445,7 @@ export const useSoundPlayer = (): UseSoundPlayerReturn => {
       setCurrentSound(sound);
       setIsPlaying(true);
     },
-    [audioContext, analyser, volume, isMuted]
+    [audioContext, analyser, volume, isMuted, checkAudioAvailability]
   );
 
   const stopSound = useCallback(() => {
