@@ -252,6 +252,12 @@ Public routes:
 
    # Backend API Configuration (optional)
    VITE_API_URL=http://localhost:3001
+
+  # Judge0 Sandbox (required for IDE)
+  VITE_JUDGE0_URL=http://localhost:2358
+  # Optional: Needed when using RapidAPI or hosted Judge0 that requires auth headers
+  VITE_JUDGE0_HOST=judge0-ce.p.rapidapi.com
+  VITE_JUDGE0_KEY=your-judge0-api-key
    ```
 
 4. **Set up Supabase**
@@ -385,6 +391,9 @@ Ensure all environment variables are set in your hosting platform:
 - `VITE_SUPABASE_ANON_KEY`
 - `VITE_GEMINI_API_KEY`
 - `VITE_RAPIDAPI_KEY`
+- `VITE_JUDGE0_URL`
+- `VITE_JUDGE0_HOST` (if required)
+- `VITE_JUDGE0_KEY` (if required)
 
 ## 🤝 Contributing
 
