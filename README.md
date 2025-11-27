@@ -2,27 +2,87 @@
 
 Edura is a comprehensive, AI-powered learning platform designed to make education accessible, engaging, and personalized. Built with modern web technologies, it combines AI assistance, gamification, community features, and multi-language support to create an inclusive learning experience.
 
-## 🌟 Features
+## Table of Contents
 
-### Core Features
-- **AI Study Assistant**: Interactive chatbot powered by Google Gemini AI for instant help and explanations
-- **Smart Learning Roadmaps**: AI-generated personalized learning paths based on your goals, skill level, and timeline
-- **AI Course Builder**: Generate complete course syllabi with adaptive modules, quizzes, and IDE-ready practice prompts
-- **Gamified Learning**: Earn XP, level up, maintain streaks, and compete on leaderboards
-- **Focus Room**: Pomodoro-style focus sessions with ambient sounds and progress tracking
-- **Study VR**: Immersive 3D virtual reality study environment powered by FrameVR for collaborative learning
-- **Notes Management**: Create, organize, and enhance notes with AI-powered summaries, flashcards, and quizzes
-- **Community Features**: Discussion forums, study groups, and mentor chat
-- **Multi-language Support**: 30+ languages with real-time translation
-- **Accessibility**: Dyslexia-friendly fonts, colorblind mode, and screen reader optimization
+1. [Overview](#overview)
+2. [Key Features](#key-features)
+3. [Architecture](#architecture)
+4. [Project Structure](#project-structure)
+5. [Prerequisites](#prerequisites)
+6. [Installation & Setup](#installation--setup)
+7. [Environment Variables](#environment-variables)
+8. [Routes](#routes)
+9. [Dependencies](#dependencies)
+10. [Security](#security)
+11. [Development](#development)
+12. [Deployment](#deployment)
+13. [Contributing](#contributing)
+14. [Roadmap](#roadmap)
+15. [License & Support](#license--support)
 
-### Technical Features
-- **Real-time Progress Tracking**: Track course progress, study sessions, and achievements
-- **Analytics Dashboard**: Visualize your learning journey with charts and statistics
-- **External Course Integration**: Browse courses from Udemy and Coursera
-- **Judge0-Powered IDE**: Monaco editor with multi-language execution via Judge0 (local or RapidAPI-hosted)
-- **Google Classroom Sync**: OAuth 2.0 import for Classroom courses and assignments feeding the AI planner
-- **File Upload Support**: Upload PDFs and text files for note-taking
+## Overview
+
+Edura blends AI tutoring, collaborative learning spaces, and productivity tooling into a single app. Learners can generate personalized courses, stay accountable with AI study planners, focus using immersive audio/visual experiences, jump into a shared Study VR room for collaborative sessions, and sync tasks from Google Classroom while keeping all content stored securely on Supabase.
+
+## Key Features
+
+### Highlights
+- **AI Guidance**: Gemini-powered tutor, roadmap builder, and course generator deliver contextual explanations, milestones, and syllabus drafts.
+- **Smart Planning**: AI Study Planner pairs Monaco/Judge0 practice tasks with auto-generated schedules and Google Classroom imports.
+- **Immersive Focus & VR**: Pomodoro room with adaptive audio/visuals, XP rewards, streak tracking, plus a dedicated Study VR space powered by FrameVR for real-time virtual collaboration.
+- **Knowledge Workspace**: Rich notes, flashcards, quizzes, discussions, mentor chat, and study groups with multilingual translation.
+- **Study Materials Hub**: Upload and organize PDFs, notes, and references with Supabase Storage folders tied to each course.
+- **AI Revision Kit**: Generate quizzes and flashcards directly from uploaded content so students can drill tricky sections instantly.
+- **Progress Intelligence**: Track streaks, XP, subject mastery, and assignment completion in unified analytics dashboards.
+- **Deadline-Aware Schedules**: Smart suggestions prioritize upcoming deadlines, Classroom imports, and personal goals to auto-build daily plans.
+- **Plain-Language Explanations**: Ask any question and the tutor breaks concepts down into simple, student-friendly language.
+- **Gamified Progress**: XP, levels, leaderboards, analytics dashboards, and streak reminders keep learners accountable.
+- **Accessibility & Globalization**: 30+ languages, translation provider, dyslexia-friendly fonts, colorblind themes, and screen-reader friendly UI.
+
+### Platform Capabilities
+- **Real-time analytics** across courses, modules, and study sessions using Supabase + Recharts visualizations.
+- **External integrations**: Udemy/Coursera discovery, Google Classroom assignment sync, Judge0 sandboxed execution, RapidAPI Deep Translate.
+- **Secure storage** with Supabase Auth + RLS, user-driven buckets for notes/audio, and Express proxy for curated course APIs.
+- **Developer-friendly stack**: TypeScript, Vite, shadcn/ui, Tailwind, Zustand, TanStack Query, Framer Motion, Monaco Editor.
+
+### Feature Deep Dive
+
+#### Learning Roadmaps
+- Two modes:
+  1. **Simple Roadmaps** for fast goal-based plans.
+  2. **Detailed Roadmaps** with questionnaires that factor skill level, timeline, commitment, and target roles.
+- AI produces milestone JSON that feeds the roadmap UI, full descriptions, and progress calculators.
+
+#### Focus Room
+- Pomodoro timers with customizable focus/break durations.
+- Ambient sound player that pulls curated MP3s or procedural noise with visualizer feedback.
+- XP rewards, streak tracking, and break reminders to maintain accountability.
+
+#### Study VR
+- Embedded [FrameVR](https://framevr.io) spaces for co-working with voice/video chat, avatars, and WASD navigation.
+- One-click link sharing plus responsive iframe layout with fullscreen support.
+
+#### Notes Workspace
+- Rich editor for notes plus PDF/text uploads stored in Supabase buckets.
+- AI generates summaries, flashcards, and quizzes per note.
+- Tagging and search keep study materials organized.
+
+#### Community & Mentorship
+- Discussion forums per topic, study groups with chat, and an AI-powered mentor chat for quick guidance.
+- Leaderboards showcase XP rankings to keep cohorts motivated.
+
+#### AI Study Planner + Classroom Sync
+- Google Identity OAuth imports Classroom courses/assignments into grouped panels (Pending/Upcoming/Completed).
+- “Add to Planner” pre-fills the AI planner with due dates, effort, and auto-prioritized tasks.
+- Optionally route Classroom calls through a Supabase Edge proxy for added security.
+
+#### Judge0 IDE Workspace
+- Monaco editor with multi-language snippets (JS/Python/Java/C) and syntax features like minimap and inline errors.
+- Executes code through a configurable Judge0 endpoint (self-hosted or RapidAPI) with stdin/stdout capture and status badges.
+
+#### Ambient Focus Audio
+- Scans `public/audio` for named ambience tracks (rain, forest, café, white-noise, ocean, space) and falls back to generated audio otherwise.
+- Audio analyzer drives particle effects in the Focus Room for immersive feedback.
 
 ## 🏗️ Architecture
 
@@ -54,64 +114,78 @@ Edura is a comprehensive, AI-powered learning platform designed to make educatio
 ### Project Structure
 
 ```
-csgirlieshack/
-├── public/                 # Static assets
-│   ├── audio/             # Sound files for focus room
-│   └── placeholder.svg
-├── server/                # Backend Express server
-│   └── index.js          # External course API
+edura/
+├── public/                      # Static assets served by Vite
+│   ├── audio/                   # Ambient tracks + README for contributors
+│   └── robots.txt               # Basic crawler rules
+├── server/
+│   └── index.js                 # Express proxy for curated external courses
 ├── src/
-│   ├── components/       # React components
-│   │   ├── ui/           # shadcn/ui components
-│   │   ├── Navbar.tsx    # Navigation bar
-│   │   ├── IDE.tsx       # Code editor component
-│   │   ├── MentorChat.tsx # Mentor chat interface
-│   │   ├── DiscussionForum.tsx # Forum component
-│   │   ├── StudyGroupChat.tsx # Study group chat
-│   │   ├── ThemeProvider.tsx # Theme context
-│   │   └── TranslationProvider.tsx # Translation context
-│   ├── hooks/            # Custom React hooks
+│   ├── App.tsx                  # Root router + layout shell
+│   ├── main.tsx                 # Vite entry point
+│   ├── components/
+│   │   ├── 3D/                  # FrameVR + particle scenes (BrainModel, HeroScene, etc.)
+│   │   ├── ui/                  # shadcn/ui primitives (accordion, dialog, chart...)
+│   │   ├── ClassroomAssignmentsPanel.tsx
+│   │   ├── DiscussionForum.tsx
+│   │   ├── IDE.tsx              # Judge0-powered Monaco editor
+│   │   ├── MentorChat.tsx
+│   │   ├── Navbar.tsx / NavLink.tsx
+│   │   ├── StudyGroupChat.tsx
+│   │   ├── ThemeProvider.tsx
+│   │   ├── TranslationProvider.tsx
+│   │   └── UniverseVisualization.tsx
+│   ├── hooks/
+│   │   ├── useGoogleClassroom.ts
+│   │   ├── useSoundPlayer.ts
 │   │   ├── useTranslation.ts
-│   │   └── useSoundPlayer.ts
-│   ├── lib/              # Core libraries
-│   │   ├── supabase.ts   # Supabase client
-│   │   ├── gemini.ts     # Gemini AI service
-│   │   ├── auth.ts       # Auth utilities
-│   │   └── utils.ts      # Utility functions
-│   ├── pages/            # Page components
-│   │   ├── Landing.tsx   # Landing page
-│   │   ├── Login.tsx     # Login page
-│   │   ├── Register.tsx # Registration page
-│   │   ├── Dashboard.tsx # User dashboard
-│   │   ├── Courses.tsx   # Course browser
-│   │   ├── CourseDetail.tsx # Course detail view
-│   │   ├── AIBot.tsx     # AI chat interface
-│   │   ├── Roadmap.tsx   # Learning roadmaps
-│   │   ├── Notes.tsx     # Notes management
-│   │   ├── FocusRoom.tsx # Focus session room
-│   │   ├── StudyVR.tsx   # Virtual reality study environment
-│   │   ├── Community.tsx # Community features
-│   │   ├── Analytics.tsx # Analytics dashboard
-│   │   └── Settings.tsx  # User settings
-│   ├── services/         # Business logic services
-│   │   ├── authService.ts      # Authentication
-│   │   ├── userService.ts       # User management
-│   │   ├── courseService.ts     # Course operations
-│   │   ├── notesService.ts      # Notes operations
-│   │   ├── roadmapService.ts    # Roadmap operations
-│   │   ├── roadmapShService.ts  # Roadmap.sh integration
-│   │   ├── communityService.ts  # Community features
-│   │   ├── leaderboardService.ts # Leaderboard
-│   │   └── translateService.ts  # Translation service
-│   ├── store/            # Zustand stores
-│   │   ├── userStore.ts  # User state
-│   │   └── themeStore.ts # Theme preferences
-│   ├── App.tsx           # Main app component
-│   └── main.tsx          # Entry point
-├── supabase-schema.sql   # Database schema
-├── vite.config.ts        # Vite configuration
-├── tailwind.config.ts    # Tailwind configuration
-└── package.json          # Dependencies
+│   │   ├── useToast.ts
+│   │   └── use-mobile.tsx
+│   ├── lib/
+│   │   ├── auth.ts               # Supabase auth helpers
+│   │   ├── gemini.ts             # Gemini client wrapper
+│   │   ├── supabase.ts           # Supabase client
+│   │   └── utils.ts
+│   ├── pages/
+│   │   ├── AIBot.tsx             # Conversational tutor
+│   │   ├── Analytics.tsx
+│   │   ├── Community.tsx
+│   │   ├── CourseDetail.tsx
+│   │   ├── Courses.tsx
+│   │   ├── Dashboard.tsx
+│   │   ├── FocusRoom.tsx
+│   │   ├── Landing.tsx
+│   │   ├── Login.tsx / Register.tsx
+│   │   ├── Notes.tsx
+│   │   ├── NotFound.tsx
+│   │   ├── Roadmap.tsx
+│   │   ├── Settings.tsx
+│   │   ├── StudyPlanner.tsx
+│   │   └── StudyVR.tsx           # Virtual collaboration room
+│   ├── services/
+│   │   ├── analyticsService.ts
+│   │   ├── authService.ts
+│   │   ├── classroomService.ts
+│   │   ├── communityService.ts
+│   │   ├── courseGeneratorService.ts
+│   │   ├── courseService.ts
+│   │   ├── leaderboardService.ts
+│   │   ├── notesService.ts
+│   │   ├── roadmapService.ts / roadmapShService.ts
+│   │   ├── translateService.ts
+│   │   └── userService.ts
+│   ├── store/
+│   │   ├── themeStore.ts
+│   │   └── userStore.ts
+│   ├── types/
+│   │   └── classroom.ts
+│   └── utils/
+│       └── generateSchedule.js
+├── supabase-schema.sql          # Database schema + policies
+├── tailwind.config.ts           # Tailwind + shadcn presets
+├── tsconfig*.json               # TS build configs
+├── vite.config.ts               # Vite plugins + aliases
+└── package.json                 # Scripts and dependencies
 ```
 
 ### Database Schema
@@ -205,10 +279,12 @@ Protected routes require authentication:
 - `/roadmap` - Learning roadmaps
 - `/notes` - Notes management
 - `/focus` - Focus room
-- `/study-vr` - Virtual reality study environment
+- `/study-planner` - AI planner with Classroom imports
+- `/study-vr` - Virtual reality collaboration room
 - `/community` - Community features
 - `/analytics` - Analytics
 - `/settings` - Settings
+- `*` - NotFound fallback
 
 Public routes:
 - `/` - Landing page
@@ -307,67 +383,6 @@ Public routes:
 9. **Open the application**
    
    Navigate to `http://localhost:8080`
-
-## 📚 Key Features Explained
-
-### Learning Roadmaps
-- Two types:
-  1. **Simple Roadmaps**: Quick goal-based roadmaps
-  2. **Detailed Roadmaps**: Comprehensive plans with questionnaires
-- AI generates personalized milestones based on:
-  - Skill level (beginner/intermediate/advanced)
-  - Timeline (days/weeks/months)
-  - Time commitment
-  - Learning goals
-
-### Focus Room
-- Pomodoro timer with customizable durations
-- Ambient sound player
-- XP rewards for completed sessions
-- Streak tracking
-- Break reminders
-
-### Study VR
-- Immersive 3D virtual reality study environment powered by [FrameVR](https://framevr.io)
-- Collaborative learning space where students can study together in real-time
-- Voice and video chat capabilities for seamless communication
-- Interactive avatars and movement controls (WASD/arrow keys)
-- Shareable link for inviting friends to join the virtual study room
-- One-click copy link functionality for easy sharing
-- Responsive iframe integration with fullscreen support
-
-### Notes Management
-- Create and organize notes
-- Upload PDF/text files
-- AI-powered features:
-  - Automatic summaries
-  - Flashcard generation
-  - Quiz creation
-- File storage via Supabase Storage
-
-### Community Features
-- Discussion forums by topic
-- Study groups with chat
-- Mentor chat (AI-powered)
-- Leaderboard rankings
-
-### AI Study Planner + Classroom Sync
-- OAuth with Google Identity Services to pull Google Classroom courses and assignments
-- Dedicated panel showing Pending, Upcoming, and Completed assignments with rich metadata
-- One-click "Add to Planner" pre-fills the AI planner form with due date, hours, and priority
-- "Generate Schedule from Classroom Tasks" instantly maps pending assignments into the AI-generated daily plan
-- Optional Supabase Edge proxy support for Classroom API calls if you prefer server-side token exchange
-
-### Judge0-Powered IDE
-- Monaco editor with syntax highlighting, minimap, and multi-language support (JS, Python, Java, C by default)
-- Executes code in a remote Judge0 sandbox to prevent untrusted code from running locally
-- Supports stdin input, stdout/stderr/compile output panels, and execution status badges
-- Configure `VITE_JUDGE0_URL` for local Docker Judge0 or RapidAPI endpoints, plus optional host/key headers
-
-### Ambient Focus Audio
-- Focus Room plays local MP3 ambience from `public/audio` when available (rain, forest, café, white noise, ocean, space)
-- Automatic fallback to procedurally generated audio if a file is missing or fails to load
-- Visualizer reacts to audio frequency data for an immersive study environment
 
 ## 🔒 Security
 
