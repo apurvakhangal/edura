@@ -319,29 +319,29 @@ Public routes:
    
    Create a `.env` file in the root directory:
    ```env
-  # Supabase Configuration
+  ### Supabase Configuration
   VITE_SUPABASE_URL=your-supabase-project-url
   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 
-  # Google Gemini AI Configuration
+  ### Google Gemini AI Configuration
   VITE_GEMINI_API_KEY=your-gemini-api-key
   VITE_GEMINI_MODEL=gemini-2.5-flash
 
-  # RapidAPI Configuration (for Translation Service)
+  ### RapidAPI Configuration (for Translation Service)
   VITE_RAPIDAPI_KEY=your-rapidapi-key
 
-  # Google Classroom OAuth
+  ### Google Classroom OAuth
   VITE_GOOGLE_CLIENT_ID=your-oauth-client-id.apps.googleusercontent.com
-  # Optional: Supabase Edge proxy that fetches Classroom data server-side
+  ### Optional: Supabase Edge proxy that fetches Classroom data server-side
   VITE_CLASSROOM_PROXY_URL=https://<your-project>.functions.supabase.co/classroom-sync
 
-  # Judge0 Sandbox (required for IDE)
+  ### Judge0 Sandbox (required for IDE)
   VITE_JUDGE0_URL=http://localhost:2358
-  # Optional: Needed when using RapidAPI or hosted Judge0 that requires auth headers
+  ### Optional: Needed when using RapidAPI or hosted Judge0 that requires auth headers
   VITE_JUDGE0_HOST=judge0-ce.p.rapidapi.com
   VITE_JUDGE0_KEY=your-judge0-api-key
 
-  # Backend API Configuration (optional)
+  ### Backend API Configuration (optional)
   VITE_API_URL=http://localhost:3001
    ```
 
