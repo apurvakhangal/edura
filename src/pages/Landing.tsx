@@ -1,11 +1,16 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { TranslatedText } from '@/components/TranslatedText';
 import { Brain, Sparkles, Target, Users, Zap, Globe } from 'lucide-react';
+import HeroScene from '@/components/3D/HeroScene';
+import { cn } from '@/lib/utils';
 
 export default function Landing() {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme !== 'light';
   const features = [
     {
       icon: Brain,
@@ -40,70 +45,85 @@ export default function Landing() {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 md:py-32">
-        <div className="container px-4">
+      <section className="relative flex min-h-[calc(100vh-4rem)] items-center overflow-hidden py-16">
+        <div className="absolute inset-0">
+          <HeroScene variant="background" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background/90" />
+          <div
+            className="pointer-events-none absolute inset-x-0 top-[-20%] h-[60vh] blur-[140px]"
+            style={{ background: isDark ? 'radial-gradient(circle, rgba(96,165,250,0.4), transparent 65%)' : 'radial-gradient(circle, rgba(96,165,250,0.25), transparent 65%)' }}
+          />
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-[-25%] h-[65vh] blur-[150px]"
+            style={{ background: isDark ? 'radial-gradient(circle, rgba(192,132,252,0.35), transparent 65%)' : 'radial-gradient(circle, rgba(192,132,252,0.3), transparent 65%)' }}
+          />
+        </div>
+
+        <div className="container relative z-10 px-4">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mx-auto max-w-3xl text-center"
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+            className="pointer-events-none mx-auto flex max-w-4xl flex-col items-center text-center pt-32 pb-12 sm:pt-40 md:pt-48"
           >
-            {/* Orbiting Animation */}
-            <div className="relative mx-auto mb-8 h-40 w-40">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                className="absolute inset-0"
+            <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}>
+              <h1
+                className={cn(
+                  'mb-5 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl',
+                  isDark ? 'text-white' : 'text-slate-900',
+                )}
               >
-                {[0, 60, 120, 180, 240, 300].map((angle) => (
-                  <motion.div
-                    key={angle}
-                    className="absolute h-6 w-6 rounded-full bg-gradient-accent"
-                    style={{
-                      top: '50%',
-                      left: '50%',
-                      transform: `rotate(${angle}deg) translateX(60px) translateY(-50%)`,
-                    }}
-                  />
-                ))}
-              </motion.div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Sparkles className="h-16 w-16 text-primary" />
-              </div>
-            </div>
-
-            <h1 className="mb-6 text-5xl font-bold tracking-tight md:text-6xl">
-              <TranslatedText text="Welcome to" />{' '}
-              <span className="bg-gradient-cosmic bg-clip-text text-transparent">
-                Edura
-              </span>
-            </h1>
-            
-            <p className="mb-8 text-xl text-muted-foreground md:text-2xl">
+                <TranslatedText text="Welcome to" />{' '}
+                <span
+                  className={cn(
+                    'bg-clip-text text-transparent',
+                    isDark
+                      ? 'bg-gradient-cosmic'
+                      : 'bg-gradient-to-r from-[#7C3AED] via-[#8B5CF6] to-[#EC4899]',
+                  )}
+                >
+                  Edura
+                </span>
+              </h1>
+            </motion.div>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className={cn('mb-10 max-w-2xl text-lg sm:text-xl', isDark ? 'text-white/85' : 'text-slate-600')}
+            >
               <TranslatedText text="An inclusive, AI-powered learning platform designed for everyone. Study smarter, learn faster, achieve more." />
-            </p>
+            </motion.p>
 
-            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.45 }}
+              className="flex flex-col items-center gap-4 sm:flex-row"
+            >
               <Link to="/register">
-                <Button size="lg" className="shadow-glow-primary">
+                <Button size="lg" className="pointer-events-auto shadow-glow-primary">
                   <TranslatedText text="Start Learning Free" />
                 </Button>
               </Link>
               <Link to="/login">
-                <Button size="lg" variant="outline">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className={cn(
+                    isDark
+                      ? 'border-white/40 text-white hover:bg-white/10'
+                      : 'border-slate-300 text-slate-900 hover:bg-white/70',
+                    'pointer-events-auto',
+                  )}
+                >
                   <TranslatedText text="Sign In" />
                 </Button>
               </Link>
-            </div>
+            </motion.div>
           </motion.div>
-        </div>
-
-        {/* Cosmic Background Effect */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute -top-1/2 left-1/4 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
-          <div className="absolute top-1/3 right-1/4 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
         </div>
       </section>
 

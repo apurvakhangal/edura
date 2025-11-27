@@ -45,6 +45,9 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@supabase/supabase-js": "^2.81.1",
     "@tanstack/react-query": "^5.83.0",
+    "@react-three/drei": "^9.121.5",
+    "@react-three/fiber": "^8.15.16",
+    "@react-three/postprocessing": "^2.16.3",
     "cheerio": "^1.0.0-rc.12",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -71,6 +74,8 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.9",
+    "three": "^0.170.0",
+    "postprocessing": "^6.36.2",
     "zod": "^3.25.76",
     "zustand": "^5.0.8"
   },
