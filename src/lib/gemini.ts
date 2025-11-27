@@ -86,6 +86,73 @@ export interface QuizQuestion {
   explanation: string;
 }
 
+export interface CourseGeneratorInput {
+  topic: string;
+  outcome: string;
+  experienceLevel: 'beginner' | 'intermediate' | 'advanced';
+  preferredFormat: 'project' | 'balanced' | 'theory';
+  learningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'read-write';
+  timePerWeek: number;
+  durationWeeks: number;
+  supportNeeds: string;
+  codingFocus: boolean;
+}
+
+export interface CoursePlanResource {
+  type: string;
+  title: string;
+  url?: string;
+  description: string;
+}
+
+export interface CoursePlanModule {
+  id: string;
+  title: string;
+  description: string;
+  focus: string;
+  durationWeeks: number;
+  learningObjectives: string[];
+  practiceIdeas: string[];
+  resources: CoursePlanResource[];
+  includeMiniProject: boolean;
+  hasCodingLab: boolean;
+  sampleCode?: string;
+}
+
+export interface CoursePlanVideoRecommendation {
+  title: string;
+  url: string;
+  channel: string;
+  duration: string;
+  reason: string;
+  videoId?: string;
+}
+
+export interface GeneratedCoursePlan {
+  title: string;
+  summary: string;
+  audience: string;
+  deliveryStyle: string;
+  weeklyCommitment: string;
+  totalDuration: string;
+  codingFocus: boolean;
+  modules: CoursePlanModule[];
+  capstone: {
+    title: string;
+    brief: string;
+    deliverables: string[];
+    evaluation: string;
+  };
+  tools: string[];
+  studyTips: string[];
+  videoRecommendations: CoursePlanVideoRecommendation[];
+  sampleIdeSnippet: {
+    language: string;
+    starter: string;
+    instructions: string;
+  };
+}
+
 function ensureApiReady() {
   if (!apiKey) {
     throw new Error('Gemini API key is not configured. Please set VITE_GEMINI_API_KEY in your .env file.');
@@ -137,6 +204,18 @@ function normalizeDifficulty(value?: string): RoadmapDifficulty {
 function toNumber(value: unknown, fallback: number): number {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function toBoolean(value: unknown, fallback = false): boolean {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    return normalized === 'true' || normalized === 'yes' || normalized === '1';
+  }
+  if (typeof value === 'number') {
+    return value === 1;
+  }
+  return fallback;
 }
 
 export async function chatWithGemini(messages: GeminiMessage[]): Promise<string> {
@@ -337,6 +416,122 @@ export async function translateText(text: string, targetLanguage: string): Promi
   } catch (error) {
     console.error('Error translating text:', error);
     throw new Error('Failed to translate text. Please try again.');
+  }
+}
+
+export async function generateCoursePlan(input: CourseGeneratorInput): Promise<GeneratedCoursePlan> {
+  try {
+    const prompt = `You are Edura's curriculum designer. Build a complete, week-by-week course outline.
+Learner profile:
+- Topic: ${input.topic}
+- Desired outcome: ${input.outcome}
+- Experience level: ${input.experienceLevel}
+- Preferred format: ${input.preferredFormat}
+- Learning style: ${input.learningStyle}
+- Weekly commitment: ${input.timePerWeek} hours
+- Total duration: ${input.durationWeeks} weeks
+- Extra support: ${input.supportNeeds}
+- Coding focus required: ${input.codingFocus ? 'yes' : 'no'}
+
+Return ONLY JSON shaped as:
+{
+  "title": "",
+  "summary": "",
+  "audience": "",
+  "deliveryStyle": "",
+  "weeklyCommitment": "",
+  "totalDuration": "",
+  "codingFocus": true,
+  "modules": [
+    {
+      "id": "1",
+      "title": "",
+      "description": "",
+      "focus": "",
+      "durationWeeks": 1,
+      "learningObjectives": [""],
+      "practiceIdeas": [""],
+      "resources": [
+        { "type": "article|video|tool", "title": "", "url": "https://...", "description": "" }
+      ],
+      "includeMiniProject": true,
+      "hasCodingLab": true,
+      "sampleCode": "// optional"
+    }
+  ],
+  "capstone": {
+    "title": "",
+    "brief": "",
+    "deliverables": [""],
+    "evaluation": ""
+  },
+  "tools": [""],
+  "studyTips": [""],
+  "videoRecommendations": [
+    { "title": "", "url": "https://www.youtube.com/watch?v=...", "channel": "", "duration": "", "reason": "", "videoId": "" }
+  ],
+  "sampleIdeSnippet": {
+    "language": "javascript|python|...",
+    "starter": "// short starter code",
+    "instructions": ""
+  }
+}`;
+
+    const text = await generateText(prompt);
+    const plan = parseJsonResponse<GeneratedCoursePlan>(text);
+
+    plan.modules = (plan.modules || []).map((module, index) => ({
+      ...module,
+      id: module.id ?? String(index + 1),
+      durationWeeks: toNumber(module.durationWeeks ?? (module as any).duration_weeks ?? 1, 1),
+      learningObjectives: Array.isArray(module.learningObjectives) ? module.learningObjectives : [],
+      practiceIdeas: Array.isArray(module.practiceIdeas) ? module.practiceIdeas : [],
+      resources: Array.isArray(module.resources)
+        ? module.resources.map((resource) => ({
+            type: resource.type || 'resource',
+            title: resource.title || 'Suggested resource',
+            url: resource.url,
+            description: resource.description || '',
+          }))
+        : [],
+      includeMiniProject: toBoolean((module as any).includeMiniProject ?? (module as any).include_mini_project, false),
+      hasCodingLab: toBoolean((module as any).hasCodingLab ?? (module as any).has_coding_lab, false),
+      sampleCode: module.sampleCode,
+    }));
+
+    if (!plan.videoRecommendations || !Array.isArray(plan.videoRecommendations) || plan.videoRecommendations.length === 0) {
+      plan.videoRecommendations = [
+        {
+          title: `${input.topic} crash course`,
+          url: `https://www.youtube.com/results?search_query=${encodeURIComponent(`${input.topic} tutorial`)}`,
+          channel: 'YouTube Search',
+          duration: '~15 min',
+          reason: 'Fallback suggestion when AI video could not be generated',
+        },
+      ];
+    }
+
+    plan.codingFocus = toBoolean(plan.codingFocus, input.codingFocus);
+
+    if (!plan.sampleIdeSnippet) {
+      plan.sampleIdeSnippet = {
+        language: input.codingFocus ? 'javascript' : 'markdown',
+        starter: input.codingFocus
+          ? `function practice${input.topic.replace(/\s+/g, '')}() {\n  console.log('Start experimenting with ${input.topic}');\n}`
+          : `### ${input.topic}\nWrite your reflections here...`,
+        instructions: input.codingFocus
+          ? 'Use this function as a sandbox to test the concept you just learned.'
+          : 'Capture key takeaways or action items for this lesson.',
+      };
+    }
+
+    plan.studyTips = Array.isArray(plan.studyTips) ? plan.studyTips : [];
+    plan.tools = Array.isArray(plan.tools) ? plan.tools : [];
+
+    return plan;
+  } catch (error) {
+    console.error('Error generating course plan:', error);
+    throw new Error('Failed to generate course plan. Please try again.');
   }
 }
 
