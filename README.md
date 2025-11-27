@@ -158,7 +158,7 @@ Embedded FrameVR spaces with:
 
 ## 🏗️ Architecture
 
-![Edura Architecture](./public/edura_architecture.png)
+![Edura Architecture](./public/edura-architecture.png)
 
 ### Technology Stack
 
