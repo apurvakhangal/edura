@@ -1,88 +1,152 @@
-# Edura - AI-Powered Learning Platform
+# ⚫✨ **Edura – AI-Powered Learning Platform**
 
-Edura is a comprehensive, AI-powered learning platform designed to make education accessible, engaging, and personalized. Built with modern web technologies, it combines AI assistance, gamification, community features, and multi-language support to create an inclusive learning experience.
+![Tech Stack](https://img.shields.io/badge/Tech%20Stack-React%2C%20TypeScript%2C%20Supabase%2C%20Google%20Gemini%2C%20Vite%2C%20Node.js%2C%20Tailwind%20CSS%2C%20Zustand%2C%20Framer%20Motion%2C%20Judge0%2C%20FrameVR-000000?style=for-the-badge&logo=none&color=blueviolet)
 
-## Table of Contents
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)]()
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)]()
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)]()
+[![Google Gemini](https://img.shields.io/badge/Gemini%20AI-Powered-4285F4?style=for-the-badge&logo=google&logoColor=white)]()
+[![Vite](https://img.shields.io/badge/Vite-Server-646CFF?style=for-the-badge&logo=vite&logoColor=white)]()
+[![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js&logoColor=white)]()
 
-1. [Overview](#overview)
-2. [Key Features](#key-features)
-3. [Architecture](#architecture)
-4. [Project Structure](#project-structure)
-5. [Prerequisites](#prerequisites)
-6. [Installation & Setup](#installation--setup)
-7. [Environment Variables](#environment-variables)
-8. [Routes](#routes)
-9. [Dependencies](#dependencies)
-10. [Security](#security)
-11. [Development](#development)
-12. [Deployment](#deployment)
-13. [Contributing](#contributing)
-14. [Roadmap](#roadmap)
-15. [License & Support](#license--support)
+---
 
-## Overview
+## 📚 **Table of Contents**
+
+1. [Overview](#-overview)
+2. [Key Features](#-key-features)
+3. [Architecture](#-architecture)
+4. [Project Structure](#-project-structure)
+5. [Prerequisites](#-prerequisites)
+6. [Installation & Setup](#-installation--setup)
+7. [Environment Variables](#-environment-variables)
+8. [Routes](#-routes)
+9. [Dependencies](#-dependencies)
+10. [Security](#-security)
+11. [Development](#-development)
+12. [Deployment](#-deployment)
+13. [Contributing](#-contributing)
+14. [Roadmap](#-roadmap)
+15. [License & Support](#-license--support)
+
+---
+
+## 🧭 **Overview**
 
 Edura blends AI tutoring, collaborative learning spaces, and productivity tooling into a single app. Learners can generate personalized courses, stay accountable with AI study planners, focus using immersive audio/visual experiences, jump into a shared Study VR room for collaborative sessions, and sync tasks from Google Classroom while keeping all content stored securely on Supabase.
 
-## Key Features
+---
 
-### Highlights
-- **AI Guidance**: Gemini-powered tutor, roadmap builder, and course generator deliver contextual explanations, milestones, and syllabus drafts.
-- **Smart Planning**: AI Study Planner pairs Monaco/Judge0 practice tasks with auto-generated schedules and Google Classroom imports.
-- **Immersive Focus & VR**: Pomodoro room with adaptive audio/visuals, XP rewards, streak tracking, plus a dedicated Study VR space powered by FrameVR for real-time virtual collaboration.
-- **Knowledge Workspace**: Rich notes, flashcards, quizzes, discussions, mentor chat, and study groups with multilingual translation.
-- **Study Materials Hub**: Upload and organize PDFs, notes, and references with Supabase Storage folders tied to each course.
-- **AI Revision Kit**: Generate quizzes and flashcards directly from uploaded content so students can drill tricky sections instantly.
-- **Progress Intelligence**: Track streaks, XP, subject mastery, and assignment completion in unified analytics dashboards.
-- **Deadline-Aware Schedules**: Smart suggestions prioritize upcoming deadlines, Classroom imports, and personal goals to auto-build daily plans.
-- **Plain-Language Explanations**: Ask any question and the tutor breaks concepts down into simple, student-friendly language.
-- **Gamified Progress**: XP, levels, leaderboards, analytics dashboards, and streak reminders keep learners accountable.
-- **Accessibility & Globalization**: 30+ languages, translation provider, dyslexia-friendly fonts, colorblind themes, and screen-reader friendly UI.
+## 🌟 **Key Features**
 
-### Platform Capabilities
-- **Real-time analytics** across courses, modules, and study sessions using Supabase + Recharts visualizations.
-- **External integrations**: Udemy/Coursera discovery, Google Classroom assignment sync, Judge0 sandboxed execution, RapidAPI Deep Translate.
-- **Secure storage** with Supabase Auth + RLS, user-driven buckets for notes/audio, and Express proxy for curated course APIs.
-- **Developer-friendly stack**: TypeScript, Vite, shadcn/ui, Tailwind, Zustand, TanStack Query, Framer Motion, Monaco Editor.
+---
 
-### Feature Deep Dive
+## 🔥 **Highlights**
 
-#### Learning Roadmaps
-- Two modes:
-  1. **Simple Roadmaps** for fast goal-based plans.
-  2. **Detailed Roadmaps** with questionnaires that factor skill level, timeline, commitment, and target roles.
-- AI produces milestone JSON that feeds the roadmap UI, full descriptions, and progress calculators.
+![Features](https://img.shields.io/badge/Features-Overview-444?style=flat)
 
-#### Focus Room
-- Pomodoro timers with customizable focus/break durations.
-- Ambient sound player that pulls curated MP3s or procedural noise with visualizer feedback.
-- XP rewards, streak tracking, and break reminders to maintain accountability.
+* **AI Guidance**: Gemini-powered tutor, roadmap builder, and course generator deliver contextual explanations, milestones, and syllabus drafts.
+* **Smart Planning**: AI Study Planner pairs Monaco/Judge0 practice tasks with auto-generated schedules and Google Classroom imports.
+* **Immersive Focus & VR**: Pomodoro room with adaptive audio/visuals, XP rewards, streak tracking, plus a dedicated Study VR space powered by FrameVR for real-time virtual collaboration.
+* **Knowledge Workspace**: Rich notes, flashcards, quizzes, discussions, mentor chat, and study groups with multilingual translation.
+* **Study Materials Hub**: Upload and organize PDFs, notes, and references with Supabase Storage folders tied to each course.
+* **AI Revision Kit**: Generate quizzes and flashcards directly from uploaded content so students can drill tricky sections instantly.
+* **Progress Intelligence**: Track streaks, XP, subject mastery, and assignment completion in unified analytics dashboards.
+* **Deadline-Aware Schedules**: Smart suggestions prioritize upcoming deadlines, Classroom imports, and personal goals to auto-build daily plans.
+* **Plain-Language Explanations**: Ask any question and the tutor breaks concepts down into simple, student-friendly language.
+* **Gamified Progress**: XP, levels, leaderboards, analytics dashboards, and streak reminders keep learners accountable.
+* **Accessibility & Globalization**: 30+ languages, translation provider, dyslexia-friendly fonts, colorblind themes, and screen-reader friendly UI.
 
-#### Study VR
-- Embedded [FrameVR](https://framevr.io) spaces for co-working with voice/video chat, avatars, and WASD navigation.
-- One-click link sharing plus responsive iframe layout with fullscreen support.
+---
 
-#### Notes Workspace
-- Rich editor for notes plus PDF/text uploads stored in Supabase buckets.
-- AI generates summaries, flashcards, and quizzes per note.
-- Tagging and search keep study materials organized.
+## 🔍 **Platform Capabilities**
 
-#### Community & Mentorship
-- Discussion forums per topic, study groups with chat, and an AI-powered mentor chat for quick guidance.
-- Leaderboards showcase XP rankings to keep cohorts motivated.
+![Platform](https://img.shields.io/badge/Platform-Capabilities-555?style=flat)
 
-#### AI Study Planner + Classroom Sync
-- Google Identity OAuth imports Classroom courses/assignments into grouped panels (Pending/Upcoming/Completed).
-- “Add to Planner” pre-fills the AI planner with due dates, effort, and auto-prioritized tasks.
-- Optionally route Classroom calls through a Supabase Edge proxy for added security.
+* **Real-time analytics** across courses, modules, and study sessions using Supabase + Recharts visualizations.
+* **External integrations**: Udemy/Coursera discovery, Google Classroom assignment sync, Judge0 sandbox execution, RapidAPI Deep Translate.
+* **Secure storage** with Supabase Auth + RLS, user-driven buckets for notes/audio, and Express proxy for curated course APIs.
+* **Developer-friendly stack**: TypeScript, Vite, shadcn/ui, Tailwind, Zustand, TanStack Query, Framer Motion, Monaco Editor.
 
-#### Judge0 IDE Workspace
-- Monaco editor with multi-language snippets (JS/Python/Java/C) and syntax features like minimap and inline errors.
-- Executes code through a configurable Judge0 endpoint (self-hosted or RapidAPI) with stdin/stdout capture and status badges.
+---
 
-#### Ambient Focus Audio
-- Scans `public/audio` for named ambience tracks (rain, forest, café, white-noise, ocean, space) and falls back to generated audio otherwise.
-- Audio analyzer drives particle effects in the Focus Room for immersive feedback.
+## 🎯 **Feature Deep Dive**
+
+### 📘 **Learning Roadmaps**
+
+Two modes:
+
+1. **Simple Roadmaps** for fast goal-based plans.
+2. **Detailed Roadmaps** with questionnaires that factor skill level, timeline, commitment, and target roles.
+
+AI produces milestone JSON that feeds the roadmap UI, full descriptions, and progress calculators.
+
+---
+
+### 🎧 **Focus Room**
+
+* Pomodoro timers
+* Ambient sound player
+* Visualizer feedback
+* XP rewards & streak tracking
+* Break reminders
+
+---
+
+### 🧑‍🤝‍🧑 **Study VR**
+
+Embedded FrameVR spaces with:
+
+* Voice/video chat
+* Avatars
+* WASD navigation
+* Fullscreen iframe support
+
+---
+
+### 📝 **Notes Workspace**
+
+* Rich editor
+* PDF/text uploads
+* AI summaries, quizzes, flashcards
+* Tagging + search
+
+---
+
+### 🧩 **Community & Mentorship**
+
+* Discussion forums
+* Study groups
+* Mentor chat (AI-powered)
+* Leaderboards
+
+---
+
+### 🗂️ **AI Study Planner + Classroom Sync**
+
+* Google Classroom OAuth import
+* Grouped assignment panels
+* AI-prioritized planning
+* Optional Supabase Edge proxy
+
+---
+
+### 💻 **Judge0 IDE Workspace**
+
+* Monaco editor
+* Multi-language snippets
+* Inline errors
+* Sandbox execution via Judge0
+
+---
+
+### 🎶 **Ambient Focus Audio**
+
+* Auto-detection of local MP3 tracks
+* Procedural fallback audio
+* Audio analyzer → particle visualizer
+
+---
 
 ## 🏗️ Architecture
 
