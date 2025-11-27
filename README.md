@@ -13,6 +13,7 @@
 [![Radix UI](https://img.shields.io/badge/Radix_UI-Components-8B5CF6?style=for-the-badge&logo=radix-ui&logoColor=white)]()
 [![Recharts](https://img.shields.io/badge/Recharts-Charts-FF6384?style=for-the-badge&logo=recharts&logoColor=white)]()
 [![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-IDE-007ACC?style=for-the-badge&logo=visual-studio-code&logoColor=white)]()
+[![FrameVR](https://img.shields.io/badge/FrameVR-Virtual_Reality-FF4500?style=for-the-badge&logo=virtual-reality&logoColor=white)]()
 
 ---
 
