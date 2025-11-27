@@ -21,12 +21,12 @@
 
 ## 📚 **Table of Contents**
 
-1. [Overview](#-overview)
-2. [Key Features](#-key-features)
-3. [Architecture](#-architecture)
+1. [Overview](#overview)
+2. [Key Features](#key-features)
+3. [Architecture](#architecture)
 4. [Project Structure](#project-structure)
 5. [Prerequisites](#prerequisites)
-6. [Installation & Setup](#installation--setup)
+6. [Installation & Setup](#installation-setup)
 7. [Environment Variables](#environment-variables)
 8. [Routes](#routes)
 9. [Dependencies](#dependencies)
@@ -35,7 +35,7 @@
 12. [Deployment](#deployment)
 13. [Contributing](#contributing)
 14. [Roadmap](#roadmap)
-15. [License & Support](#license--support)
+15. [License & Support](#license-support)
 
 ---
 
