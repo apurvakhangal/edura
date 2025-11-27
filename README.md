@@ -1,13 +1,18 @@
 # ⚫✨ **Edura – AI-Powered Learning Platform**
 
-![Tech Stack](https://img.shields.io/badge/Tech%20Stack-React%2C%20TypeScript%2C%20Supabase%2C%20Google%20Gemini%2C%20Vite%2C%20Node.js%2C%20Tailwind%20CSS%2C%20Zustand%2C%20Framer%20Motion%2C%20Judge0%2C%20FrameVR-000000?style=for-the-badge&logo=none&color=blueviolet)
-
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)]()
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)]()
 [![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)]()
 [![Google Gemini](https://img.shields.io/badge/Gemini%20AI-Powered-4285F4?style=for-the-badge&logo=google&logoColor=white)]()
 [![Vite](https://img.shields.io/badge/Vite-Server-646CFF?style=for-the-badge&logo=vite&logoColor=white)]()
 [![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js&logoColor=white)]()
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-Styling-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)]()
+[![Zustand](https://img.shields.io/badge/Zustand-State_Management-FF9900?style=for-the-badge&logo=zustand&logoColor=white)]()
+[![TanStack Query](https://img.shields.io/badge/TanStack_Query-Server_State-FF4154?style=for-the-badge&logo=react-query&logoColor=white)]()
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-Animations-0055FF?style=for-the-badge&logo=framer&logoColor=white)]()
+[![Radix UI](https://img.shields.io/badge/Radix_UI-Components-8B5CF6?style=for-the-badge&logo=radix-ui&logoColor=white)]()
+[![Recharts](https://img.shields.io/badge/Recharts-Charts-FF6384?style=for-the-badge&logo=recharts&logoColor=white)]()
+[![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-IDE-007ACC?style=for-the-badge&logo=visual-studio-code&logoColor=white)]()
 
 ---
 
