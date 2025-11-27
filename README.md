@@ -7,6 +7,7 @@ Edura is a comprehensive, AI-powered learning platform designed to make educatio
 ### Core Features
 - **AI Study Assistant**: Interactive chatbot powered by Google Gemini AI for instant help and explanations
 - **Smart Learning Roadmaps**: AI-generated personalized learning paths based on your goals, skill level, and timeline
+- **AI Course Builder**: Generate complete course syllabi with adaptive modules, quizzes, and IDE-ready practice prompts
 - **Gamified Learning**: Earn XP, level up, maintain streaks, and compete on leaderboards
 - **Focus Room**: Pomodoro-style focus sessions with ambient sounds and progress tracking
 - **Study VR**: Immersive 3D virtual reality study environment powered by FrameVR for collaborative learning
@@ -19,7 +20,8 @@ Edura is a comprehensive, AI-powered learning platform designed to make educatio
 - **Real-time Progress Tracking**: Track course progress, study sessions, and achievements
 - **Analytics Dashboard**: Visualize your learning journey with charts and statistics
 - **External Course Integration**: Browse courses from Udemy and Coursera
-- **IDE Integration**: Built-in code editor for programming courses with test cases
+- **Judge0-Powered IDE**: Monaco editor with multi-language execution via Judge0 (local or RapidAPI-hosted)
+- **Google Classroom Sync**: OAuth 2.0 import for Classroom courses and assignments feeding the AI planner
 - **File Upload Support**: Upload PDFs and text files for note-taking
 
 ## 🏗️ Architecture
@@ -220,7 +222,9 @@ Public routes:
 - Node.js 18+ and npm
 - A Supabase account (free tier works)
 - Google Gemini API key
-- RapidAPI account (for translation features)
+- RapidAPI account (for translation features and hosted Judge0 access, optional)
+- Google Cloud project with the Classroom API enabled (for Google Classroom import)
+- Judge0 sandbox (self-hosted container or RapidAPI Judge0 CE plan) for the IDE
 
 ### Installation
 
@@ -239,30 +243,30 @@ Public routes:
    
    Create a `.env` file in the root directory:
    ```env
-   # Supabase Configuration
-   VITE_SUPABASE_URL=your-supabase-project-url
-   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+  # Supabase Configuration
+  VITE_SUPABASE_URL=your-supabase-project-url
+  VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 
-   # Google Gemini AI Configuration
-   VITE_GEMINI_API_KEY=your-gemini-api-key
-   VITE_GEMINI_MODEL=gemini-2.5-flash
+  # Google Gemini AI Configuration
+  VITE_GEMINI_API_KEY=your-gemini-api-key
+  VITE_GEMINI_MODEL=gemini-2.5-flash
+
+  # RapidAPI Configuration (for Translation Service)
+  VITE_RAPIDAPI_KEY=your-rapidapi-key
 
   # Google Classroom OAuth
   VITE_GOOGLE_CLIENT_ID=your-oauth-client-id.apps.googleusercontent.com
   # Optional: Supabase Edge proxy that fetches Classroom data server-side
   VITE_CLASSROOM_PROXY_URL=https://<your-project>.functions.supabase.co/classroom-sync
 
-   # RapidAPI Configuration (for Translation)
-   VITE_RAPIDAPI_KEY=your-rapidapi-key
-
-   # Backend API Configuration (optional)
-   VITE_API_URL=http://localhost:3001
-
   # Judge0 Sandbox (required for IDE)
   VITE_JUDGE0_URL=http://localhost:2358
   # Optional: Needed when using RapidAPI or hosted Judge0 that requires auth headers
   VITE_JUDGE0_HOST=judge0-ce.p.rapidapi.com
   VITE_JUDGE0_KEY=your-judge0-api-key
+
+  # Backend API Configuration (optional)
+  VITE_API_URL=http://localhost:3001
    ```
 
 4. **Set up Supabase**
@@ -284,7 +288,12 @@ Public routes:
   - Paste the generated client ID into `VITE_GOOGLE_CLIENT_ID`
   - (Optional) Deploy a Supabase Edge Function and set `VITE_CLASSROOM_PROXY_URL` if you prefer proxying Classroom requests through your backend
 
-7. **Run the development servers**
+7. **Optional: Add custom ambient audio**
+  - Drop your `.mp3` ambience files into `public/audio`
+  - Supported filenames: `rain.mp3`, `forest.mp3`, `cafe.mp3`, `white-noise.mp3`, `ocean.mp3`, `space.mp3`
+  - The Focus Room will automatically detect these; if a file is missing it falls back to generated audio
+
+8. **Run the development servers**
    
    ```bash
    # Run both frontend and backend
@@ -295,7 +304,7 @@ Public routes:
    npm run dev:server   # Backend (port 3001)
    ```
 
-8. **Open the application**
+9. **Open the application**
    
    Navigate to `http://localhost:8080`
 
@@ -348,6 +357,17 @@ Public routes:
 - One-click "Add to Planner" pre-fills the AI planner form with due date, hours, and priority
 - "Generate Schedule from Classroom Tasks" instantly maps pending assignments into the AI-generated daily plan
 - Optional Supabase Edge proxy support for Classroom API calls if you prefer server-side token exchange
+
+### Judge0-Powered IDE
+- Monaco editor with syntax highlighting, minimap, and multi-language support (JS, Python, Java, C by default)
+- Executes code in a remote Judge0 sandbox to prevent untrusted code from running locally
+- Supports stdin input, stdout/stderr/compile output panels, and execution status badges
+- Configure `VITE_JUDGE0_URL` for local Docker Judge0 or RapidAPI endpoints, plus optional host/key headers
+
+### Ambient Focus Audio
+- Focus Room plays local MP3 ambience from `public/audio` when available (rain, forest, café, white noise, ocean, space)
+- Automatic fallback to procedurally generated audio if a file is missing or fails to load
+- Visualizer reacts to audio frequency data for an immersive study environment
 
 ## 🔒 Security
 
@@ -409,12 +429,14 @@ Ensure all environment variables are set in your hosting platform:
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`
 - `VITE_GEMINI_API_KEY`
+- `VITE_GEMINI_MODEL`
 - `VITE_RAPIDAPI_KEY`
 - `VITE_GOOGLE_CLIENT_ID`
 - `VITE_CLASSROOM_PROXY_URL` (if using Supabase Edge proxy)
 - `VITE_JUDGE0_URL`
 - `VITE_JUDGE0_HOST` (if required)
 - `VITE_JUDGE0_KEY` (if required)
+- `VITE_API_URL` (if the Express server runs on a different host)
 
 ## 🤝 Contributing
 

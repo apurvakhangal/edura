@@ -1,154 +1,167 @@
 # Edura Setup Guide
 
-This guide will help you set up the Edura project with Supabase and Gemini AI integration.
+This guide walks through configuring every service Edura integrates with: Supabase, Gemini AI, RapidAPI translation, Judge0, Google Classroom OAuth, and optional ambient audio for the Focus Room.
 
 ## Prerequisites
 
-- Node.js 18+ installed
-- A Supabase account (free tier works)
-- Gemini API key (already provided)
+- Node.js 18+ and npm
+- Git
+- Supabase project (free tier works)
+- Google AI Studio key for Gemini
+- RapidAPI account (Deep Translate + optional Judge0 CE endpoint)
+- Judge0 sandbox (self-hosted Docker or RapidAPI)
+- Google Cloud project with the Classroom API enabled
 
-## Step 1: Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-# Gemini API Configuration
-VITE_GEMINI_API_KEY=gemini-api-key
-VITE_GEMINI_MODEL=gemini-model
-# Supabase Configuration
-VITE_SUPABASE_URL=your-supabase-project-url
-VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-```
-
-## Step 2: Set Up Supabase
-
-1. **Create a Supabase Project:**
-   - Go to [supabase.com](https://supabase.com)
-   - Create a new project
-   - Wait for the project to be fully provisioned
-
-2. **Get Your Supabase Credentials:**
-   - Go to Project Settings → API
-   - Copy the "Project URL" → This is your `VITE_SUPABASE_URL`
-   - Copy the "anon public" key → This is your `VITE_SUPABASE_ANON_KEY`
-   - Update your `.env` file with these values
-
-3. **Set Up the Database Schema:**
-   - Go to SQL Editor in your Supabase dashboard
-   - Copy the contents of `supabase-schema.sql`
-   - Paste and run it in the SQL Editor
-   - This will create all necessary tables, indexes, and security policies
-
-4. **Set Up Storage:**
-   - The schema includes storage bucket creation
-   - If needed, you can also create it manually:
-     - Go to Storage in Supabase dashboard
-     - Create a new bucket named "notes"
-     - Make it public if you want public file access
-
-## Step 3: Install Dependencies
+## 1. Clone & Install
 
 ```bash
+git clone <repository-url>
+cd csgirlieshack
 npm install
 ```
 
-## Step 4: Run the Development Server
+## 2. Configure Environment Variables
 
-```bash
-npm run dev
+Copy `.env.example` to `.env` and fill in the following values:
+
+```env
+# Supabase
+VITE_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+
+# Gemini AI
+VITE_GEMINI_API_KEY=your-gemini-api-key
+VITE_GEMINI_MODEL=gemini-2.5-flash
+
+# Translation (RapidAPI Deep Translate)
+VITE_RAPIDAPI_KEY=your-rapidapi-key
+
+# Judge0 sandbox for the IDE
+VITE_JUDGE0_URL=http://localhost:2358
+# Optional when using RapidAPI Judge0 CE
+VITE_JUDGE0_HOST=judge0-ce.p.rapidapi.com
+VITE_JUDGE0_KEY=your-rapidapi-judge0-key
+
+# Google Classroom OAuth
+VITE_GOOGLE_CLIENT_ID=your-oauth-client.apps.googleusercontent.com
+# Optional Supabase Edge proxy (leave blank to call Google directly)
+VITE_CLASSROOM_PROXY_URL=https://<project>.functions.supabase.co/classroom-sync
+
+# Backend API (Express proxy for external courses)
+VITE_API_URL=http://localhost:3001
 ```
 
-The app should now be running at `http://localhost:8080`
+> Tip: keep `.env` out of version control. The repo already ignores it, but double-check before committing.
 
-## Step 5: Test the Integration
+## 3. Supabase Setup
 
-1. **Test Authentication:**
-   - Go to `/register` and create a new account
-   - Check Supabase Auth → Users to see if the user was created
-   - Check the `users` table to see if the profile was created
+1. **Create a project** at [supabase.com](https://supabase.com) and wait for provisioning.
+2. **Database schema**:
+   - Open SQL Editor → `+ New query`
+   - Paste `supabase-schema.sql`
+   - Run the script to create tables, RLS policies, buckets, and helper functions
+3. **Storage bucket**: The SQL script creates the `notes` bucket. If you skipped the script, add it manually via Storage → "Create bucket".
+4. **API credentials**: Project Settings → API. Copy URL + anon key into `.env`.
 
-2. **Test AI Features:**
-   - Go to `/ai-bot` and send a message
-   - It should get a response from Gemini AI
-   - Go to `/notes` and upload a text file
-   - Generate a summary, flashcards, or quiz
+## 4. External Services
 
-3. **Test Roadmap:**
-   - Go to `/roadmap`
-   - Enter a learning goal
-   - Generate a roadmap (uses Gemini AI)
+### Gemini AI
+- Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+- Create an API key and paste it into `VITE_GEMINI_API_KEY`
+- Adjust `VITE_GEMINI_MODEL` if you want a different Gemini model (e.g., `gemini-1.5-flash`)
+
+### RapidAPI Deep Translate
+- Subscribe to the **Deep Translate** API on RapidAPI
+- Copy the key into `VITE_RAPIDAPI_KEY`
+
+### Judge0 Sandbox
+Choose one of the options:
+1. **Self-hosted** (recommended for development)
+   ```bash
+   docker run -d -p 2358:2358 judge0/api:latest
+   ```
+   - Keep `VITE_JUDGE0_URL=http://localhost:2358`
+   - Leave `VITE_JUDGE0_HOST`/`VITE_JUDGE0_KEY` blank
+2. **RapidAPI Judge0 CE**
+   - Subscribe on RapidAPI
+   - Set `VITE_JUDGE0_URL=https://judge0-ce.p.rapidapi.com`
+   - Set `VITE_JUDGE0_HOST=judge0-ce.p.rapidapi.com`
+   - Set `VITE_JUDGE0_KEY=<your RapidAPI key>`
+
+## 5. Google Classroom OAuth
+
+1. Enable the Classroom API in [Google Cloud Console](https://console.cloud.google.com/)
+2. Configure the OAuth consent screen (External) and add required scopes:
+   - `https://www.googleapis.com/auth/classroom.courses.readonly`
+   - `https://www.googleapis.com/auth/classroom.coursework.me`
+   - `https://www.googleapis.com/auth/classroom.coursework.me.readonly`
+   - `https://www.googleapis.com/auth/userinfo.email`
+   - `https://www.googleapis.com/auth/userinfo.profile`
+3. Create OAuth credentials → **Web application**
+   - Authorized JavaScript origin: `http://localhost:8080`
+   - Authorized redirect URI: `http://localhost:8080`
+4. Copy the generated client ID into `VITE_GOOGLE_CLIENT_ID`
+5. (Optional but recommended for production) Deploy a Supabase Edge Function that proxies Classroom calls and set `VITE_CLASSROOM_PROXY_URL`
+
+## 6. Optional: Ambient Audio Files
+
+Place custom MP3 files in `public/audio` with the exact filenames below. The Focus Room will prefer these over synthesized audio:
+- `rain.mp3`
+- `forest.mp3`
+- `cafe.mp3`
+- `white-noise.mp3`
+- `ocean.mp3`
+- `space.mp3`
+
+## 7. Start the App
+
+```bash
+npm run dev:all   # launches Vite + Express proxy
+# OR
+npm run dev       # frontend only on port 8080
+npm run dev:server # backend only on port 3001
+```
+
+Visit `http://localhost:8080`.
+
+## 8. Smoke Tests
+
+1. **Auth + Supabase**: Register a user → confirm entry in Supabase Auth & `users` table
+2. **AI Bot**: Open `/ai-bot`, submit a question, verify Gemini response
+3. **Notes AI**: Upload a note on `/notes` and generate a summary/flashcards
+4. **Study Planner + Classroom**: On `/study-planner`, click "Import from Google Classroom" and verify assignments populate the tabs, then generate a schedule
+5. **IDE**: Open a Monaco editor instance (from a generated course), run code, and confirm Judge0 output
+6. **Focus Room audio**: Start a sound in `/focus-room` and ensure custom MP3s play (falls back if missing)
 
 ## Troubleshooting
 
-### Authentication Issues
+### Supabase / Auth
+- `Supabase credentials not configured`: double-check `.env` and restart dev server
+- `permission denied` queries: ensure RLS policies from `supabase-schema.sql` ran successfully
 
-- **Error: "Supabase credentials not configured"**
-  - Make sure your `.env` file has the correct Supabase URL and anon key
-  - Restart the dev server after updating `.env`
+### Gemini / Translation
+- `Failed to get response from AI`: verify API key, quota, and browser console logs
+- `429 Too Many Requests`: lower usage or upgrade your quota
 
-- **Error: "Failed to create user"**
-  - Check Supabase dashboard → Authentication → Settings
-  - Ensure email authentication is enabled
-  - Check if email confirmation is required (disable for testing)
+### Judge0 IDE
+- `Failed to reach execution sandbox`: ensure Judge0 Docker container is running or RapidAPI credentials are valid
+- `CORS errors`: confirm `VITE_JUDGE0_URL` points to an accessible HTTPS endpoint in production
 
-### AI/Gemini Issues
+### Google Classroom
+- `popup_closed_by_user`: ensure pop-ups are allowed for `localhost:8080`
+- `insufficient permissions`: confirm all Classroom scopes are authorized in Google Cloud Console
+- `403 rateLimitExceeded`: enable caching via `VITE_CLASSROOM_PROXY_URL` or reduce refresh frequency
 
-- **Error: "Failed to get response from AI"**
-  - Check if the Gemini API key is correct
-  - Verify you have API quota remaining
-  - Check browser console for detailed error messages
+## Security Notes
 
-### Database Issues
+- Never commit `.env` or share API keys publicly
+- Rotate credentials if you suspect exposure
+- Restrict Supabase anon key privileges via RLS policies (already configured by `supabase-schema.sql`)
 
-- **Error: "relation does not exist"**
-  - Make sure you ran the `supabase-schema.sql` file
-  - Check Supabase dashboard → Database → Tables to verify tables exist
+## Need Help?
 
-- **Error: "permission denied"**
-  - Check Row Level Security (RLS) policies
-  - Ensure you're authenticated when making requests
-  - Verify RLS policies in `supabase-schema.sql` were created
-
-## Next Steps
-
-- [ ] Set up Google Translate API (optional)
-- [ ] Implement file upload for PDFs/images
-- [ ] Add real-time features for community
-- [ ] Set up analytics tracking
-- [ ] Deploy to production (Vercel/Netlify)
-
-## Project Structure
-
-```
-src/
-├── lib/
-│   ├── supabase.ts      # Supabase client configuration
-│   └── gemini.ts        # Gemini AI service functions
-├── services/
-│   ├── authService.ts   # Authentication functions
-│   ├── userService.ts   # User profile functions
-│   ├── notesService.ts  # Notes and AI generation
-│   └── roadmapService.ts # Roadmap generation
-├── pages/               # React page components
-├── components/          # Reusable UI components
-└── store/               # Zustand state management
-```
-
-## API Keys Security
-
-⚠️ **Important:** Never commit your `.env` file to version control!**
-
-The `.env` file is already in `.gitignore`, but make sure:
-- Don't share your API keys publicly
-- Use environment variables in production
-- Rotate keys if they're accidentally exposed
-
-## Support
-
-If you encounter any issues:
-1. Check the browser console for errors
-2. Check Supabase logs (Dashboard → Logs)
-3. Verify all environment variables are set correctly
-4. Ensure all dependencies are installed
+1. Check browser dev tools for errors
+2. Review Supabase logs (Dashboard → Logs)
+3. Re-run `npm install` to ensure dependencies are intact
+4. Open an issue or contact the maintainers with detailed logs
 
