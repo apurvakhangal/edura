@@ -14,6 +14,8 @@
 [![Recharts](https://img.shields.io/badge/Recharts-Charts-FF6384?style=for-the-badge&logo=recharts&logoColor=white)]()
 [![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-IDE-007ACC?style=for-the-badge&logo=visual-studio-code&logoColor=white)]()
 [![FrameVR](https://img.shields.io/badge/FrameVR-Virtual_Reality-FF4500?style=for-the-badge&logo=virtual-reality&logoColor=white)]()
+[![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-UI_Library-8B5CF6?style=for-the-badge&logo=radix-ui&logoColor=white)]()
+[![DeepTranslate](https://img.shields.io/badge/DeepTranslate-Translation-FF6F61?style=for-the-badge&logo=google-translate&logoColor=white)]()
 
 ---
 
@@ -22,18 +24,18 @@
 1. [Overview](#-overview)
 2. [Key Features](#-key-features)
 3. [Architecture](#-architecture)
-4. [Project Structure](#-project-structure)
-5. [Prerequisites](#-prerequisites)
-6. [Installation & Setup](#-installation--setup)
-7. [Environment Variables](#-environment-variables)
-8. [Routes](#-routes)
-9. [Dependencies](#-dependencies)
-10. [Security](#-security)
-11. [Development](#-development)
-12. [Deployment](#-deployment)
-13. [Contributing](#-contributing)
-14. [Roadmap](#-roadmap)
-15. [License & Support](#-license--support)
+4. [Project Structure](#project-structure)
+5. [Prerequisites](#prerequisites)
+6. [Installation & Setup](#installation--setup)
+7. [Environment Variables](#environment-variables)
+8. [Routes](#routes)
+9. [Dependencies](#dependencies)
+10. [Security](#security)
+11. [Development](#development)
+12. [Deployment](#deployment)
+13. [Contributing](#contributing)
+14. [Roadmap](#roadmap)
+15. [License & Support](#license--support)
 
 ---
 
