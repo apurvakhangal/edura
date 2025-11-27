@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,7 +24,7 @@ const todayISODate = () => {
   return now.toISOString().split('T')[0];
 };
 
-function StudyPlannerForm({ onAddTask, onGenerateSchedule, tasks = [] }) {
+function StudyPlannerForm({ onAddTask, onGenerateSchedule, tasks = [], prefillTask, onPrefillConsumed }) {
   const [formState, setFormState] = useState({
     name: '',
     deadlineDate: todayISODate(),
@@ -36,6 +36,15 @@ function StudyPlannerForm({ onAddTask, onGenerateSchedule, tasks = [] }) {
   const updateField = (field, value) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
   };
+
+  useEffect(() => {
+    if (!prefillTask) return;
+    setFormState((prev) => ({
+      ...prev,
+      ...prefillTask,
+    }));
+    onPrefillConsumed?.();
+  }, [prefillTask, onPrefillConsumed]);
 
   const handleSubmit = (event) => {
     event.preventDefault();

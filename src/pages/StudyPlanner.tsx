@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,9 @@ import StudyPlannerForm from '@/components/StudyPlannerForm';
 import ScheduleList from '@/components/ScheduleList';
 import ScheduleCalendar from '@/components/ScheduleCalendar';
 import { generateSchedule } from '@/utils/generateSchedule';
+import ClassroomAssignmentsPanel from '@/components/ClassroomAssignmentsPanel';
+import useGoogleClassroom from '@/hooks/useGoogleClassroom';
+import type { ClassroomAssignment } from '@/types/classroom';
 
 const PRIORITY_BADGES = {
   high: 'bg-red-500/15 text-red-500',
@@ -34,12 +37,79 @@ const formatLocalDateLabel = (isoDate) => {
   });
 };
 
+const fallbackDueDate = () => {
+  const date = new Date();
+  date.setDate(date.getDate() + 3);
+  return date.toISOString();
+};
+
+const toDateInput = (isoString: string) => {
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return '';
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+};
+
+const toTimeInput = (isoString: string) => {
+  const date = new Date(isoString);
+  if (Number.isNaN(date.getTime())) return '18:00';
+  const hour = String(date.getHours()).padStart(2, '0');
+  const minute = String(date.getMinutes()).padStart(2, '0');
+  return `${hour}:${minute}`;
+};
+
+const resolvePriority = (dueIso?: string | null) => {
+  if (!dueIso) return 'medium';
+  const dueDate = new Date(dueIso);
+  if (Number.isNaN(dueDate.getTime())) return 'medium';
+  const diffHours = (dueDate.getTime() - Date.now()) / (1000 * 60 * 60);
+  if (diffHours <= 48) return 'high';
+  if (diffHours <= 24 * 7) return 'medium';
+  return 'low';
+};
+
+const assignmentToTask = (assignment: ClassroomAssignment) => {
+  const dueDate = assignment.dueDateTime || fallbackDueDate();
+  return {
+    id: createId(),
+    name: assignment.title,
+    deadline: dueDate,
+    estimatedHours: 2,
+    priority: resolvePriority(dueDate),
+    source: 'google-classroom',
+    sourceAssignmentId: assignment.id,
+    courseName: assignment.courseName,
+  };
+};
+
+const assignmentToPrefill = (assignment: ClassroomAssignment) => {
+  const dueDate = assignment.dueDateTime || fallbackDueDate();
+  return {
+    name: assignment.title,
+    deadlineDate: toDateInput(dueDate),
+    deadlineTime: toTimeInput(dueDate),
+    estimatedHours: '2',
+    priority: resolvePriority(dueDate),
+  };
+};
+
 const StudyPlanner = () => {
   const [tasks, setTasks] = useState([]);
   const [schedule, setSchedule] = useState([]);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTasks, setSelectedTasks] = useState([]);
+  const [prefillTask, setPrefillTask] = useState(null);
   const { toast } = useToast();
+  const {
+    assignments: classroomAssignments,
+    loading: classroomLoading,
+    error: classroomError,
+    userProfile,
+    lastSyncedAt,
+    isConnected: classroomConnected,
+    connectAndSync,
+  } = useGoogleClassroom();
 
   const totalHours = useMemo(
     () => tasks.reduce((sum, task) => sum + Number(task.estimatedHours || 0), 0),
@@ -50,27 +120,90 @@ const StudyPlanner = () => {
     setTasks((prev) => [...prev, { ...task, id: createId() }]);
   };
 
-  const handleGenerateSchedule = () => {
-    const plan = generateSchedule(tasks);
-    setSchedule(plan);
-    const firstDay = plan[0];
-    setSelectedDate(firstDay?.date || '');
-    setSelectedTasks(firstDay?.tasks || []);
+  const handleGenerateSchedule = useCallback(
+    (tasksToSchedule = tasks) => {
+      const plan = generateSchedule(tasksToSchedule);
+      setSchedule(plan);
+      const firstDay = plan[0];
+      setSelectedDate(firstDay?.date || '');
+      setSelectedTasks(firstDay?.tasks || []);
 
-    toast({
-      title: plan.length ? 'Study schedule ready' : 'Need more info',
-      description: plan.length
-        ? 'We distributed your workload. Tap any day to view focus blocks.'
-        : 'Add at least one task with a deadline to generate a plan.',
-    });
-
-    const urgentSlot = plan.find((day) => day.tasks.some((task) => task.priority === 'high'));
-    if (urgentSlot) {
       toast({
-        title: 'Urgent block scheduled',
-        description: `Focus on ${urgentSlot.tasks.find((task) => task.priority === 'high')?.task} on ${new Date(
-          urgentSlot.date,
-        ).toLocaleDateString()}.`,
+        title: plan.length ? 'Study schedule ready' : 'Need more info',
+        description: plan.length
+          ? 'We distributed your workload. Tap any day to view focus blocks.'
+          : 'Add at least one task with a deadline to generate a plan.',
+      });
+
+      const urgentSlot = plan.find((day) => day.tasks.some((task) => task.priority === 'high'));
+      if (urgentSlot) {
+        toast({
+          title: 'Urgent block scheduled',
+          description: `Focus on ${urgentSlot.tasks.find((task) => task.priority === 'high')?.task} on ${new Date(
+            urgentSlot.date,
+          ).toLocaleDateString()}.`,
+          variant: 'destructive',
+        });
+      }
+    },
+    [tasks, toast],
+  );
+
+  const handlePrefillFromAssignment = (assignment: ClassroomAssignment) => {
+    setPrefillTask(assignmentToPrefill(assignment));
+    toast({
+      title: 'Planner pre-filled',
+      description: `Review and add “${assignment.title}” to your queue.`,
+    });
+  };
+
+  const handleBulkScheduleFromClassroom = () => {
+    const pendingAssignments = classroomAssignments.pending;
+    if (!pendingAssignments.length) {
+      toast({
+        title: 'No Classroom tasks',
+        description: 'Sync pending assignments before generating a schedule.',
+      });
+      return;
+    }
+
+    setTasks((prev) => {
+      const existingAssignmentIds = new Set(
+        prev.map((task) => task.sourceAssignmentId).filter(Boolean),
+      );
+      const newTasks = pendingAssignments
+        .map(assignmentToTask)
+        .filter((task) => !existingAssignmentIds.has(task.sourceAssignmentId));
+
+      if (!newTasks.length) {
+        toast({
+          title: 'Already imported',
+          description: 'All pending Classroom assignments are already in your planner.',
+        });
+        return prev;
+      }
+
+      const updated = [...prev, ...newTasks];
+      handleGenerateSchedule(updated);
+      toast({
+        title: 'Schedule generated',
+        description: 'Pending Classroom tasks were added and scheduled automatically.',
+      });
+      return updated;
+    });
+  };
+
+  const handleImportFromClassroom = async () => {
+    try {
+      await connectAndSync();
+      toast({
+        title: 'Classroom synced',
+        description: 'Courses and assignments imported successfully.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Sync failed',
+        description: error instanceof Error ? error.message : 'Unable to reach Google Classroom.',
         variant: 'destructive',
       });
     }
@@ -101,6 +234,8 @@ const StudyPlanner = () => {
             onAddTask={handleAddTask}
             onGenerateSchedule={handleGenerateSchedule}
             tasks={tasks}
+            prefillTask={prefillTask}
+            onPrefillConsumed={() => setPrefillTask(null)}
           />
 
           <Card className="mt-6">
@@ -129,6 +264,18 @@ const StudyPlanner = () => {
 
         <div className="lg:col-span-2 space-y-6">
           <ScheduleCalendar schedule={schedule} onDateSelect={handleDateSelect} />
+
+          <ClassroomAssignmentsPanel
+            assignments={classroomAssignments}
+            loading={classroomLoading}
+            error={classroomError}
+            isConnected={classroomConnected}
+            userLabel={userProfile?.name || userProfile?.email || undefined}
+            lastSyncedAt={lastSyncedAt}
+            onImport={handleImportFromClassroom}
+            onBulkGenerate={handleBulkScheduleFromClassroom}
+            onPrefill={handlePrefillFromAssignment}
+          />
 
           <Card>
             <CardHeader>
@@ -164,7 +311,7 @@ const StudyPlanner = () => {
                 ))
               )}
               {schedule.length > 0 && (
-                <Button variant="ghost" size="sm" onClick={handleGenerateSchedule}>
+                <Button variant="ghost" size="sm" onClick={() => handleGenerateSchedule()}>
                   Re-run AI distribution
                 </Button>
               )}

@@ -247,6 +247,11 @@ Public routes:
    VITE_GEMINI_API_KEY=your-gemini-api-key
    VITE_GEMINI_MODEL=gemini-2.5-flash
 
+  # Google Classroom OAuth
+  VITE_GOOGLE_CLIENT_ID=your-oauth-client-id.apps.googleusercontent.com
+  # Optional: Supabase Edge proxy that fetches Classroom data server-side
+  VITE_CLASSROOM_PROXY_URL=https://<your-project>.functions.supabase.co/classroom-sync
+
    # RapidAPI Configuration (for Translation)
    VITE_RAPIDAPI_KEY=your-rapidapi-key
 
@@ -272,7 +277,14 @@ Public routes:
    - **Gemini API**: Get from [Google AI Studio](https://makersuite.google.com/app/apikey)
    - **RapidAPI**: Get from [RapidAPI Hub](https://rapidapi.com/hub) (subscribe to Deep Translate API)
 
-6. **Run the development servers**
+6. **Configure Google Classroom OAuth**
+  - Enable the Google Classroom API in [Google Cloud Console](https://console.cloud.google.com/)
+  - Create an OAuth 2.0 Web Client with origin `http://localhost:8080` (or your deployed domain)
+  - Add the scopes used by this app (courses.readonly, coursework.me, userinfo.email/profile)
+  - Paste the generated client ID into `VITE_GOOGLE_CLIENT_ID`
+  - (Optional) Deploy a Supabase Edge Function and set `VITE_CLASSROOM_PROXY_URL` if you prefer proxying Classroom requests through your backend
+
+7. **Run the development servers**
    
    ```bash
    # Run both frontend and backend
@@ -283,7 +295,7 @@ Public routes:
    npm run dev:server   # Backend (port 3001)
    ```
 
-7. **Open the application**
+8. **Open the application**
    
    Navigate to `http://localhost:8080`
 
@@ -329,6 +341,13 @@ Public routes:
 - Study groups with chat
 - Mentor chat (AI-powered)
 - Leaderboard rankings
+
+### AI Study Planner + Classroom Sync
+- OAuth with Google Identity Services to pull Google Classroom courses and assignments
+- Dedicated panel showing Pending, Upcoming, and Completed assignments with rich metadata
+- One-click "Add to Planner" pre-fills the AI planner form with due date, hours, and priority
+- "Generate Schedule from Classroom Tasks" instantly maps pending assignments into the AI-generated daily plan
+- Optional Supabase Edge proxy support for Classroom API calls if you prefer server-side token exchange
 
 ## 🔒 Security
 
@@ -391,6 +410,8 @@ Ensure all environment variables are set in your hosting platform:
 - `VITE_SUPABASE_ANON_KEY`
 - `VITE_GEMINI_API_KEY`
 - `VITE_RAPIDAPI_KEY`
+- `VITE_GOOGLE_CLIENT_ID`
+- `VITE_CLASSROOM_PROXY_URL` (if using Supabase Edge proxy)
 - `VITE_JUDGE0_URL`
 - `VITE_JUDGE0_HOST` (if required)
 - `VITE_JUDGE0_KEY` (if required)
