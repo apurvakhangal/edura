@@ -381,7 +381,7 @@ Public routes:
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd csgirlieshack
+   cd edura
    ```
 
 2. **Install dependencies**
