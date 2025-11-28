@@ -11,7 +11,7 @@ export default function StudyVR() {
   const user = useUserStore((state) => state.user);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
-  const vrLink = 'https://framevr.io/csgirlieshack';
+  const vrLink = 'https://framevr.io/edura';
 
   const copyToClipboard = async () => {
     try {
