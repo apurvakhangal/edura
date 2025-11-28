@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -111,6 +111,12 @@ const StudyPlanner = () => {
     connectAndSync,
   } = useGoogleClassroom();
 
+  useEffect(() => {
+    // Clear tasks and schedule on component mount
+    setTasks([]);
+    setSchedule([]);
+  }, []);
+
   const totalHours = useMemo(
     () => tasks.reduce((sum, task) => sum + Number(task.estimatedHours || 0), 0),
     [tasks],
@@ -123,7 +129,7 @@ const StudyPlanner = () => {
   const handleGenerateSchedule = useCallback(
     (tasksToSchedule = tasks) => {
       const plan = generateSchedule(tasksToSchedule);
-      setSchedule(plan);
+      setSchedule([]); // Clear the existing schedule
       const firstDay = plan[0];
       setSelectedDate(firstDay?.date || '');
       setSelectedTasks(firstDay?.tasks || []);

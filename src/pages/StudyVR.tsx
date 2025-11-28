@@ -129,7 +129,7 @@ export default function StudyVR() {
           <CardContent className="p-0">
             <div className="relative w-full bg-black rounded-b-lg overflow-hidden">
               <iframe
-                src="https://framevr.io/csgirlieshack"
+                src="https://framevr.io/edura"
                 className="w-full border-0"
                 allow="microphone; camera; fullscreen; autoplay"
                 allowFullScreen
