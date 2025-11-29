@@ -9,7 +9,7 @@
 5. [Prerequisites](./#prerequisites)
 6. [Installation & Setup](./#installation)
 7. [Environment Variables](./#environment-variables)
-8. [Routes](./#routes)
+8. [Routes](./#routing)
 9. [Dependencies](./#dependencies)
 10. [Security](./#security)
 11. [Development](./#development)
