@@ -7,7 +7,7 @@
 3. [Architecture](./#architecture)
 4. [Project Structure](./#project-structure)
 5. [Prerequisites](./#prerequisites)
-6. [Installation & Setup](./#installation-setup)
+6. [Installation & Setup](./#installation)
 7. [Environment Variables](./#environment-variables)
 8. [Routes](./#routes)
 9. [Dependencies](./#dependencies)
