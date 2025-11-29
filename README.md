@@ -1,11 +1,7 @@
-# ⚫✨ Edura – AI Powered Study and Learning Companion
-
+# Edura - AI Powered Study and Learning Companion
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge\&logo=react\&logoColor=black)](./) [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge\&logo=typescript\&logoColor=white)](./) [![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=for-the-badge\&logo=supabase\&logoColor=white)](./) [![Google Gemini](https://img.shields.io/badge/Gemini%20AI-Powered-4285F4?style=for-the-badge\&logo=google\&logoColor=white)](./) [![Vite](https://img.shields.io/badge/Vite-Server-646CFF?style=for-the-badge\&logo=vite\&logoColor=white)](./) [![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge\&logo=node.js\&logoColor=white)](./) [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-Styling-06B6D4?style=for-the-badge\&logo=tailwindcss\&logoColor=white)](./) [![Zustand](https://img.shields.io/badge/Zustand-State_Management-FF9900?style=for-the-badge\&logo=zustand\&logoColor=white)](./) [![TanStack Query](https://img.shields.io/badge/TanStack_Query-Server_State-FF4154?style=for-the-badge\&logo=react-query\&logoColor=white)](./) [![Framer Motion](https://img.shields.io/badge/Framer_Motion-Animations-0055FF?style=for-the-badge\&logo=framer\&logoColor=white)](./) [![Radix UI](https://img.shields.io/badge/Radix_UI-Components-8B5CF6?style=for-the-badge\&logo=radix-ui\&logoColor=white)](./) [![Recharts](https://img.shields.io/badge/Recharts-Charts-FF6384?style=for-the-badge\&logo=recharts\&logoColor=white)](./) [![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-IDE-007ACC?style=for-the-badge\&logo=visual-studio-code\&logoColor=white)](./) [![FrameVR](https://img.shields.io/badge/FrameVR-Virtual_Reality-FF4500?style=for-the-badge\&logo=virtual-reality\&logoColor=white)](./) [![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-UI_Library-8B5CF6?style=for-the-badge\&logo=radix-ui\&logoColor=white)](./) [![DeepTranslate](https://img.shields.io/badge/DeepTranslate-Translation-FF6F61?style=for-the-badge\&logo=google-translate\&logoColor=white)](./)
 
-***
-
-## 📚 **Table of Contents**
-
+## **Table of Contents**
 1. [Overview](./#overview)
 2. [Key Features](./#key-features)
 3. [Architecture](./#architecture)
@@ -22,19 +18,13 @@
 14. [Roadmap](./#roadmap)
 15. [License & Support](./#license-support)
 
-***
-
-## 🧭 **Overview**
+## **Overview**
 
 Edura blends AI tutoring, collaborative learning spaces, and productivity tooling into a single app. Learners can generate personalized courses, stay accountable with AI study planners, focus using immersive audio/visual experiences, jump into a shared Study VR room for collaborative sessions, and sync tasks from Google Classroom while keeping all content stored securely on Supabase.
 
-***
+## **Key Features**
 
-## 🌟 **Key Features**
-
-***
-
-## 🔥 **Highlights**
+### **Highlights**
 
 ![Features](https://img.shields.io/badge/Features-Overview-444?style=flat)
 
@@ -50,9 +40,7 @@ Edura blends AI tutoring, collaborative learning spaces, and productivity toolin
 * **Gamified Progress**: XP, levels, leaderboards, analytics dashboards, and streak reminders keep learners accountable.
 * **Accessibility & Globalization**: 30+ languages, translation provider, dyslexia-friendly fonts, colorblind themes, and screen-reader friendly UI.
 
-***
-
-## 🔍 **Platform Capabilities**
+### **Platform Capabilities**
 
 ![Platform](https://img.shields.io/badge/Platform-Capabilities-555?style=flat)
 
@@ -61,11 +49,8 @@ Edura blends AI tutoring, collaborative learning spaces, and productivity toolin
 * **Secure storage** with Supabase Auth + RLS, user-driven buckets for notes/audio, and Express proxy for curated course APIs.
 * **Developer-friendly stack**: TypeScript, Vite, shadcn/ui, Tailwind, Zustand, TanStack Query, Framer Motion, Monaco Editor.
 
-***
-
-## 🎯 **Feature Deep Dive**
-
-### 📘 **Learning Roadmaps**
+### **Feature Deep Dive**
+#### **Learning Roadmaps**
 
 Two modes:
 
@@ -74,9 +59,7 @@ Two modes:
 
 AI produces milestone JSON that feeds the roadmap UI, full descriptions, and progress calculators.
 
-***
-
-### 🎧 **Focus Room**
+#### **Focus Room**
 
 * Pomodoro timers
 * Ambient sound player
@@ -84,9 +67,7 @@ AI produces milestone JSON that feeds the roadmap UI, full descriptions, and pro
 * XP rewards & streak tracking
 * Break reminders
 
-***
-
-### 🧑‍🤝‍🧑 **Study VR**
+#### **Study VR**
 
 Embedded FrameVR spaces with:
 
@@ -95,53 +76,41 @@ Embedded FrameVR spaces with:
 * WASD navigation
 * Fullscreen iframe support
 
-***
-
-### 📝 **Notes Workspace**
+#### **Notes Workspace**
 
 * Rich editor
 * PDF/text uploads
 * AI summaries, quizzes, flashcards
 * Tagging + search
 
-***
-
-### 🧩 **Community & Mentorship**
+#### **Community & Mentorship**
 
 * Discussion forums
 * Study groups
 * Mentor chat (AI-powered)
 * Leaderboards
 
-***
-
-### 🗂️ **AI Study Planner + Classroom Sync**
+#### **AI Study Planner + Classroom Sync**
 
 * Google Classroom OAuth import
 * Grouped assignment panels
 * AI-prioritized planning
 * Optional Supabase Edge proxy
 
-***
-
-### 💻 **Judge0 IDE Workspace**
+#### **Judge0 IDE Workspace**
 
 * Monaco editor
 * Multi-language snippets
 * Inline errors
 * Sandbox execution via Judge0
 
-***
-
-### 🎶 **Ambient Focus Audio**
+#### **Ambient Focus Audio**
 
 * Auto-detection of local MP3 tracks
 * Procedural fallback audio
 * Audio analyzer → particle visualizer
 
-***
-
-## 🏗️ Architecture
+## Architecture
 
 <picture><source srcset=".gitbook/assets/edura-architecture.png" media="(prefers-color-scheme: dark)"><img src=".gitbook/assets/final_architecture.png" alt="Edura Architecture"></picture>
 
@@ -354,7 +323,7 @@ Public routes:
 * `/login` - Login
 * `/register` - Registration
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -381,43 +350,42 @@ Public routes:
 3.  **Set up environment variables**
 
     Create a `.env` file in the root directory:
+    ```bash
+    ### Supabase Configuration
 
-    ```env
+    VITE_SUPABASE_URL=your-supabase-project-url 
+    VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+
+    ### Google Gemini AI Configuration
+
+    VITE_GEMINI_API_KEY=your-gemini-api-key
+    VITE_GEMINI_MODEL=gemini-model
+
+    ### RapidAPI Configuration (for Translation Service)
+
+    VITE_RAPIDAPI_KEY=your-rapidapi-key
+
+    ### Google Classroom OAuth
+
+    VITE_GOOGLE_CLIENT_ID=your-oauth-client-id.apps.googleusercontent.com
+
+    ### Optional: Supabase Edge proxy that fetches Classroom data server-side
+
+    VITE_CLASSROOM_PROXY_URL=https://.functions.supabase.co/classroom-sync
+
+    ### Judge0 Sandbox (required for IDE)
+
+    VITE_JUDGE0_URL=http://localhost:2358
+
+    ### Optional: Needed when using RapidAPI or hosted Judge0 that requires auth headers
+
+    VITE_JUDGE0_HOST=judge0-ce.p.rapidapi.com
+    VITE_JUDGE0_KEY=your-judge0-api-key
+
+    ### Backend API Configuration (optional)
+
+    VITE_API_URL=http://localhost:3001
     ```
-
-### Supabase Configuration
-
-VITE\_SUPABASE\_URL=your-supabase-project-url VITE\_SUPABASE\_ANON\_KEY=your-supabase-anon-key
-
-### Google Gemini AI Configuration
-
-VITE\_GEMINI\_API\_KEY=your-gemini-api-key VITE\_GEMINI\_MODEL=gemini-2.5-flash
-
-### RapidAPI Configuration (for Translation Service)
-
-VITE\_RAPIDAPI\_KEY=your-rapidapi-key
-
-### Google Classroom OAuth
-
-VITE\_GOOGLE\_CLIENT\_ID=your-oauth-client-id.apps.googleusercontent.com
-
-### Optional: Supabase Edge proxy that fetches Classroom data server-side
-
-VITE\_CLASSROOM\_PROXY\_URL=https://.functions.supabase.co/classroom-sync
-
-### Judge0 Sandbox (required for IDE)
-
-VITE\_JUDGE0\_URL=http://localhost:2358
-
-### Optional: Needed when using RapidAPI or hosted Judge0 that requires auth headers
-
-VITE\_JUDGE0\_HOST=judge0-ce.p.rapidapi.com VITE\_JUDGE0\_KEY=your-judge0-api-key
-
-### Backend API Configuration (optional)
-
-VITE\_API\_URL=http://localhost:3001
-
-````
 
 4. **Set up Supabase**
 
@@ -458,7 +426,7 @@ npm run dev:server   # Backend (port 3001)
 
     Navigate to `http://localhost:8080`
 
-## 🔒 Security
+## Security
 
 * **Environment Variables**: All API keys stored in `.env` (not committed)
 * **Row Level Security**: Database-level security via Supabase RLS
@@ -466,7 +434,7 @@ npm run dev:server   # Backend (port 3001)
 * **Protected Routes**: Client-side route protection
 * **API Key Validation**: Server-side validation for external APIs
 
-## 🛠️ Development
+## Development
 
 ### Available Scripts
 
@@ -484,7 +452,7 @@ npm run dev:server   # Backend (port 3001)
 * Prettier (via ESLint) for formatting
 * Component-based architecture
 
-## 📦 Dependencies
+## Dependencies
 
 ### Core Dependencies
 
@@ -504,7 +472,7 @@ npm run dev:server   # Backend (port 3001)
 * `lucide-react` - Icons
 * `recharts` - Charts
 
-## 🌐 Deployment
+## Deployment
 
 ### Frontend (Vite)
 
@@ -533,7 +501,7 @@ Ensure all environment variables are set in your hosting platform:
 * `VITE_JUDGE0_KEY` (if required)
 * `VITE_API_URL` (if the Express server runs on a different host)
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -541,11 +509,11 @@ Ensure all environment variables are set in your hosting platform:
 4. Test thoroughly
 5. Submit a pull request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License.
 
-## 🆘 Support
+## Support
 
 For issues and questions:
 
@@ -554,7 +522,7 @@ For issues and questions:
 3. Check Supabase logs (Dashboard → Logs)
 4. Review the [SETUP.md](SETUP.md) guide
 
-## 🎯 Roadmap
+## Roadmap
 
 * [ ] Real-time collaboration features
 * [ ] Mobile app (React Native)
@@ -564,14 +532,12 @@ For issues and questions:
 * [ ] Certificate generation
 * [ ] Integration with more learning platforms
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 * Built with [Vite](https://vitejs.dev/)
 * UI components from [shadcn/ui](https://ui.shadcn.com/)
 * Database powered by [Supabase](https://supabase.com/)
 * AI powered by [Google Gemini](https://deepmind.google/technologies/gemini/)
 * Virtual reality environment powered by [FrameVR](https://framevr.io)
-
-***
 
 **Note**: Make sure to never commit your `.env` file. The `.env` file is already in `.gitignore` for security.
